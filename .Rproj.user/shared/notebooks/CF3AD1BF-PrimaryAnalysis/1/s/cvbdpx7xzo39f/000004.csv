@@ -1,0 +1,6 @@
+"0","list.games <- list.files(""data/"", pattern = ""_g.rds"")"
+"0","list.surveys <- list.files(""data/"", pattern = ""_s.rds"")"
+"0","list.games <- paste0(""data/"", list.games)"
+"0","list.surveys <- paste0(""data/"", list.surveys)"
+"0","df.trial <- readRDS(""data/dataTrialLevel.rds"")"
+"0","df.game <- readRDS(""data/dataGameLevel.rds"")"

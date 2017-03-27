@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# --------------------\n# Create Folder with the usable data\n# --------------------\n# note that this script will not work as it is now. I just uploaded\n# it for documentation purposes. What it does/ did is that it put the usable data\n# in a one folder and the one we could not use in another. The usable data is now\n# in anonymized form (see script dataPrepAnonymizeData.R) in the data folder.\n\n\n# Data-Folder names \nbatches <- c(\"Batch1\", \"Batch2\", \"Batch3\")\n\n# loop through these folders\nfor (ba in batches){\n  \n  # list the files that contain the id variables\n  setwd(paste0(\"C:/Users/Markus/Dropbox/Masterarbeit/DataAndAnalysis/DataPilotRun3/Ids\", ba))\n  fil <- list.files()\n  \n  # read in the id files and save the ids in a matrix\n  ids <- matrix(NA, ncol = 1, nrow = length(fil))\n  for (ii in 1:length(fil)){\n    temp.df <- read.table(fil[ii], header = T, sep = \",\")\n    ids[ii, 1] <- as.character(temp.df[1, 1])\n  }\n  \n  # get the ids of those who either only accessed one part of the study or when it crashed\n  table.ids <- table(ids)\n  exclude1 <- names(table.ids[table.ids != 2])\n  unique.ids <- unique(ids)\n  \n  # copy the datafiles to a new directory using command prompt\n  for (fi in 1:length(unique.ids)){\n    \n    # for the ones with exclusion criteria\n    if(unique.ids[fi] %in% exclude1){\n      \n      # list the files\n      data.files <- list.files(paste0(\"C:/Users/Markus/Dropbox/Masterarbeit/DataAndAnalysis/DataPilotRun3/\", ba),\n                               pattern = unique.ids[fi])\n      \n      if (length(data.files) > 0){\n        for (jj in 1:length(data.files)){\n          \n          # create the command with the filenames\n          filename <- data.files[jj]\n          command = paste0(\"copy \",\n                           \"C:\\\\Users\\\\Markus\\\\Dropbox\\\\Masterarbeit\\\\DataAndAnalysis\\\\DataPilotRun3\\\\\", ba, \"\\\\\",\n                           filename,\n                           \" C:\\\\Users\\\\Markus\\\\Dropbox\\\\Masterarbeit\\\\DataAndAnalysis\\\\DataPilotRun3\\\\errorData\\\\\",\n                           filename)\n          \n          # send command to the console\n          system2(\"cmd.exe\", input = command)\n        }\n      }\n    } else {\n      \n      # list the files\n      data.files <- list.files(paste0(\"C:/Users/Markus/Dropbox/Masterarbeit/DataAndAnalysis/DataPilotRun3/\", ba),\n                               pattern = unique.ids[fi])\n      \n      \n      if (length(data.files) > 0){\n        for (jj in 1:length(data.files)){\n          \n          # create the command with the filenames\n          filename <- data.files[jj]\n          command = paste0(\"copy \",\n                           \"C:\\\\Users\\\\Markus\\\\Dropbox\\\\Masterarbeit\\\\DataAndAnalysis\\\\DataPilotRun3\\\\\", ba, \"\\\\\",\n                           filename,\n                           \" C:\\\\Users\\\\Markus\\\\Dropbox\\\\Masterarbeit\\\\DataAndAnalysis\\\\DataPilotRun3\\\\useData\\\\\",\n                           filename)\n          \n          # send command to the console\n          system2(\"cmd.exe\", input = command)\n        }\n      }\n    }\n  }\n}\n",
+    "created" : 1490612215730.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "734307317",
+    "id" : "50DF594",
+    "lastKnownWriteTime" : 1490538824,
+    "last_content_update" : 1490538824,
+    "path" : "C:/Users/Markus/Dropbox/Masterarbeit/eegoals/R/dataPrep01_CleanData.R",
+    "project_path" : "R/dataPrep01_CleanData.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
