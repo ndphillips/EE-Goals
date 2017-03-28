@@ -133,11 +133,11 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   # prior.sd.start = 1            # Prior standard deviation
   # goal = 50                    # Goal
   # epsilon = .1                 # epsilon parameter for egreedy.fun
-  # theta = .5                    # theta parameter for softmax.fun  
+  # theta = .5                    # theta parameter for softmax.fun
   # alpha = .2                    # alpha updating rate for rw.fun
   # selection.strat = "softmax"   # softmax or egreedy
   # strategy = "rsf"               # Either ev or rsf
-  # plot = FALSE 
+  # plot = FALSE
   # ylim = NULL
   
   
@@ -238,6 +238,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
          if(mean(is.finite(p.getthere)) == 1) {
          
          if(sum(p.getthere) == 0) {
+           
            selprob.i <- rep(1 / n.options, n.options)} else {
          
       selprob.i <- p.getthere / sum(p.getthere)
@@ -250,7 +251,6 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
        
        if(selection.strat == "egreedy") {
          
-    
          selprob.i <- egreedy.fun(p.getthere, epsilon)
          
        }
