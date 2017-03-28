@@ -1,5 +1,0 @@
-"0","library(yarrr)"
-"0","library(knitr)"
-"0","library(BayesFactor)"
-"0","opts_chunk$set(echo = TRUE)"
-"0","opts_knit$set(root.dir = ""C:/Users/Markus/Dropbox/Masterarbeit/eegoals"")"
