@@ -125,7 +125,20 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
                        ylim = NULL) {
   
   
-  
+  # TESTING
+  # n.trials = 25                # Trials in game
+  # option.mean = c(2, 3)   # Mean of each option
+  # option.sd = c(1, 5)       # SD of each option
+  # prior.exp.start = rep(0, 2)  # Prior expectations
+  # prior.sd.start = 1            # Prior standard deviation
+  # goal = 50                    # Goal
+  # epsilon = .1                 # epsilon parameter for egreedy.fun
+  # theta = .5                    # theta parameter for softmax.fun  
+  # alpha = .2                    # alpha updating rate for rw.fun
+  # selection.strat = "softmax"   # softmax or egreedy
+  # strategy = "rsf"               # Either ev or rsf
+  # plot = FALSE 
+  # ylim = NULL
   
   
   # Get some game parameters from inputs
@@ -154,9 +167,18 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   
   selection.v <- rep(NA, n.trials)      # Actual selections
   outcome.v <- rep(NA, n.trials)        # Actual outcomes
-  selprob.mtx <- matrix(NA,             # Selection probabilities
+  selprob.mtx <- as.data.frame(matrix(NA,             # Selection probabilities
                         nrow = n.trials, 
-                        ncol = n.options)
+                        ncol = n.options))
+  
+  names(selprob.mtx) <- paste0("sel.", letters[1:n.options])
+  
+  gt.mtx <- as.data.frame(matrix(NA,             # p get there
+                                nrow = n.trials, 
+                                ncol = n.options))
+  
+  names(gt.mtx) <- paste0("gt.", letters[1:n.options])
+  
   
   reward.mtx <- matrix(NA, nrow = n.trials, ncol = n.options)
   
@@ -167,6 +189,23 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
     # STEP 0: Get prior expectations for current trial
     
     exp.prior.i <- exp.prior.mtx[trial.i,]
+    
+    # Determine probability of reaching goal for each option
+    points.earned <- sum(outcome.v[1:trial.i], na.rm = TRUE)
+    points.needed <- goal - sum(outcome.v[1:trial.i], na.rm = TRUE)
+    
+    sd.observed <- sapply(1:n.options, FUN = function(x) {sd(reward.mtx[,x], na.rm = TRUE)})
+    sd.observed[is.na(sd.observed)] <- prior.sd.start
+    
+    trials.left <- n.trials - trial.i
+    
+    p.getthere <- p.getthere.fun(points.needed = points.needed,
+                                 trials.left = trials.left,
+                                 mu = exp.prior.i,
+                                 sigma = sd.observed)
+    
+    
+    
     
     # STEP 1: SELECT AN OPTION
     
@@ -193,19 +232,6 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
     
     # RSF strategy: Select according to probability of reaching the goal
     if(strategy == "rsf") {
-      
-      points.earned <- sum(outcome.v[1:trial.i], na.rm = TRUE)
-      points.needed <- goal - sum(outcome.v[1:trial.i], na.rm = TRUE)
-      
-      sd.observed <- sapply(1:n.options, FUN = function(x) {sd(reward.mtx[,x], na.rm = TRUE)})
-      sd.observed[is.na(sd.observed)] <- prior.sd.start
-      
-      trials.left <- n.trials - trial.i
-      
-      p.getthere <- p.getthere.fun(points.needed = points.needed,
-                                    trials.left = trials.left,
-                                    mu = exp.prior.i,
-                                    sigma = sd.observed)
        
        if(selection.strat == "softmax") {
        
@@ -269,6 +295,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
     selection.v[trial.i] <- selection.i # Actual selection
     outcome.v[trial.i] <- outcome.i     # Actual outcome
     reward.mtx[trial.i, selection.i] <- outcome.i
+    gt.mtx[trial.i,] <- p.getthere
   }
   
   # Put main results in a single dataframe called sim.result.df
@@ -277,6 +304,10 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
                               "outcome" = outcome.v,
                               "outcome.cum" = cumsum(outcome.v),
                               stringsAsFactors = FALSE)
+  
+  sim.result.df <- cbind(sim.result.df, selprob.mtx, gt.mtx)
+  
+  sim.result.df
   
   # Should simulation be plotted?
   

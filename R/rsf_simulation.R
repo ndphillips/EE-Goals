@@ -23,7 +23,7 @@ sim.dm <- expand.grid(goal = c(70),                               # Goal
                       n.trials = c(25),                           # Trials in game
                       environment = 1:3,                          # Option environment
                       strategy = c("ev", "rsf"),                  # General strategy
-                      selection.strat = c("egreedy", "softmax"),  # Selection strategy
+                      selection.strat = c("egreedy"),  # Selection strategy
                       sim = 1:500)                                # Simulations
 
 # Each statistical environment is defined as a dataframe of means and standard deviations
@@ -97,7 +97,7 @@ sim.result.df <- do.call(rbind, sim.result.ls)
 sim.dm <- cbind(sim.dm, sim.result.df)
 
 # Calculate aggreagte statistics across simulations
-sim.dm.agg <- sim.dm %>% group_by(goal, n.trials, environment, strategy, selection.strat) %>%
+sim.dm.agg <- sim.dm %>% group_by(goal, n.trials, environment, strategy) %>%
   summarise(
     reachgoal.p = mean(reach.goal, na.rm = TRUE),
     risky.mean= mean(risky, na.rm = TRUE),
@@ -108,10 +108,10 @@ sim.dm.agg <- sim.dm %>% group_by(goal, n.trials, environment, strategy, selecti
 
 
 # Plotting
-yarrr::pirateplot(reach.goal ~ strategy + environment + selection.strat, data = sim.dm)
-yarrr::pirateplot(risky ~ strategy + environment + selection.strat, data = sim.dm)
-yarrr::pirateplot(risky.ag ~ strategy + environment + selection.strat, data = sim.dm)
-yarrr::pirateplot(risky.ug ~ strategy + environment + selection.strat, data = sim.dm)
+yarrr::pirateplot(reach.goal ~ strategy + environment, data = sim.dm)
+yarrr::pirateplot(risky ~ strategy + environment, data = sim.dm)
+yarrr::pirateplot(risky.ag ~ strategy + environment, data = sim.dm)
+yarrr::pirateplot(risky.ug ~ strategy + environment, data = sim.dm)
 
 
 
