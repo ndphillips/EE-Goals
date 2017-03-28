@@ -2,6 +2,7 @@
 # main analysis code of eegoals pilot study
 # ---------------------
 
+
 # get list of data
 
 list.games <- list.files("data/", pattern = "_g.csv")

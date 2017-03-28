@@ -67,7 +67,7 @@ egreedy.fun <- function(exp.current = c(5, 3, 6),   # A vector of expectations
     
     if(n.options == 2) {
       
-      selection <- setdiff(1:options.n, best)
+      selection <- setdiff(1:n.options, best)
       
     } else {
       
@@ -123,7 +123,11 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
                        strategy = "ev",               # Either ev or rsf
                        plot = FALSE, 
                        ylim = NULL) {
-
+  
+  
+  
+  
+  
   # Get some game parameters from inputs
   n.options <- length(option.mean)
   

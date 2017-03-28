@@ -1,9 +1,0 @@
-"0","round(aggregate(sex ~ condition, FUN = table, data = df.participant)$sex[1:4] / sum(aggregate(sex ~ condition, FUN = table, data = df.participant)$sex), 2) * 100
-"
-"1","[1]"
-"1"," 24"
-"1"," 27"
-"1"," 24"
-"1"," 24"
-"1","
-"
