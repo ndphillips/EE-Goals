@@ -53,10 +53,10 @@ mean(df.trial$sel.high.EV != df.trial$sel.high.samp.mean)
 # ----------------------------
 
 # create variable with proportion of correct predictions
-RSF.df <- aggregate(sel.RSF == selection ~ participant + condition, FUN = mean, data = df.trial)
-high.samp.mean.df <- aggregate(sel.high.samp.mean == selection ~ participant + condition,
+RSF.df <- aggregate(sel.RSF == selection ~ workerid + condition, FUN = mean, data = df.trial)
+high.samp.mean.df <- aggregate(sel.high.samp.mean == selection ~ workerid + condition,
                                FUN = mean, data = df.trial)
-sel.high.EV.df <- aggregate(sel.high.EV == selection ~ participant + condition,
+sel.high.EV.df <- aggregate(sel.high.EV == selection ~ workerid + condition,
                             FUN = mean, data = df.trial)
 
 # save all in one dataframe
@@ -75,11 +75,11 @@ aggregate(RSF.acc > high.EV.acc ~ condition, FUN = mean, data = RSF.df)
 # Does model 2 (RSF) outperform model 1 (high sample mean) when people are closer to the goal?
 
 # create variable with proportion of correct predictions
-RSF.df.g <- aggregate(sel.RSF == selection ~ participant + condition, FUN = mean,
+RSF.df.g <- aggregate(sel.RSF == selection ~ workerid + condition, FUN = mean,
                       data = subset(df.trial, trial >= 40))
-high.samp.mean.df <- aggregate(sel.high.samp.mean == selection ~ participant + condition,
+high.samp.mean.df <- aggregate(sel.high.samp.mean == selection ~ workerid + condition,
                                FUN = mean, data = subset(df.trial, trial >= 40))
-sel.high.EV.df <- aggregate(sel.high.EV == selection ~ participant + condition,
+sel.high.EV.df <- aggregate(sel.high.EV == selection ~ workerid + condition,
                             FUN = mean, data = subset(df.trial, trial >= 40))
 # save all in one dataframe
 names(RSF.df.g)[3] <- "RSF.acc"
@@ -131,10 +131,10 @@ par(mfrow = c(2,2))
 for (cc in 1:4){
   plot(1, type = "n", ylab = "correct pred RSF", xlab = "Trial", ylim = c(0, 1), xlim = c(w.size, 50),
        xaxs = "i", yaxs = "i", main = paste("RSF Condition", cc))
-  n.df<- aggregate(RSF.p ~ participant + trial, FUN = mean, data = subset(df.trial, condition == cc))
-  mean(df.trial$RSF.p[df.trial$participant == 1 & df.trial == 7])
-  for (part in unique(n.df$participant)){
-    lines(7:50, n.df$RSF.p[n.df$participant == part], col = l.cols[cc])
+  n.df<- aggregate(RSF.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  mean(df.trial$RSF.p[df.trial$workerid == 1 & df.trial == 7])
+  for (part in unique(n.df$workerid)){
+    lines(7:50, n.df$RSF.p[n.df$workerid == part], col = l.cols[cc])
   }
   
   n.df<- aggregate(RSF.p ~ trial, FUN = mean, data = n.df)
@@ -148,10 +148,10 @@ windows(height = 22, width = 33)
 par(mfrow = c(2,2))
 for (cc in 1:4){
   plot(1, type = "n", ylab = "correct pred high sample mean", xlab = "Trial", ylim = c(0, 1), xlim = c(w.size, 50), xaxs = "i", yaxs = "i", main = paste("High samp mean Condition", cc))
-  n.df<- aggregate(samp.mean.p ~ participant + trial, FUN = mean, data = subset(df.trial, condition == cc))
-  mean(df.trial$samp.mean.p[df.trial$participant == 1 & df.trial == 7])
-  for (part in unique(n.df$participant)){
-    lines(7:50, n.df$samp.mean.p[n.df$participant == part], col = l.cols[cc])
+  n.df<- aggregate(samp.mean.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  mean(df.trial$samp.mean.p[df.trial$workerid == 1 & df.trial == 7])
+  for (part in unique(n.df$workerid)){
+    lines(7:50, n.df$samp.mean.p[n.df$workerid == part], col = l.cols[cc])
   }
   
   n.df<- aggregate(samp.mean.p ~ trial, FUN = mean, data = n.df)
@@ -165,10 +165,10 @@ windows(height = 22, width = 33)
 par(mfrow = c(2,2))
 for (cc in 1:4){
   plot(1, type = "n", ylab = "correct pred high sample mean", xlab = "Trial", ylim = c(0, 1), xlim = c(w.size, 50), xaxs = "i", yaxs = "i", main = paste("High EV Condition", cc))
-  n.df<- aggregate(EV.p ~ participant + trial, FUN = mean, data = subset(df.trial, condition == cc))
-  mean(df.trial$EV.p[df.trial$participant == 1 & df.trial == 7])
-  for (part in unique(n.df$participant)){
-    lines(7:50, n.df$EV.p[n.df$participant == part], col = l.cols[cc])
+  n.df<- aggregate(EV.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  mean(df.trial$EV.p[df.trial$workerid == 1 & df.trial == 7])
+  for (part in unique(n.df$workerid)){
+    lines(7:50, n.df$EV.p[n.df$workerid == part], col = l.cols[cc])
   }
   
   n.df<- aggregate(EV.p ~ trial, FUN = mean, data = n.df)
@@ -176,3 +176,25 @@ for (cc in 1:4){
   
 }
 
+
+# plot the curves
+windows(height = 22, width = 33)
+par(mfrow = c(2,2))
+for (cc in 1:4){
+  plot(1, type = "n", ylab = "proportion of correct prediction", xlab = "Trial", ylim = c(0, 1), xlim = c(7, 50), xaxs = "i", yaxs = "i", main = paste("Condition", cc))
+  
+  n.df<- aggregate(RSF.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  n.df<- aggregate(RSF.p ~ trial, FUN = mean, data = n.df)
+  lines(7:50, n.df$RSF.p, col = l.cols.m[1], lwd =2)
+  
+  n.df<- aggregate(samp.mean.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  n.df<- aggregate(samp.mean.p ~ trial, FUN = mean, data = n.df)
+  lines(7:50, n.df$samp.mean.p, col = l.cols.m[2], lwd =2)
+  
+  n.df<- aggregate(EV.p ~ workerid + trial, FUN = mean, data = subset(df.trial, condition == cc))
+  n.df<- aggregate(EV.p ~ trial, FUN = mean, data = n.df)
+  lines(7:50, n.df$EV.p, col = l.cols.m[3], lwd =2)
+  legend("topleft", c("RSF", "EV max", "high samp mean"), lty = 1, lwd = 2,col = l.cols.m[1:3])
+  
+  
+}

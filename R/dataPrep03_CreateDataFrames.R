@@ -1,11 +1,16 @@
+rm(list = ls())
+gc()
 # ---------------------------
 # Script to create dataframes from the separate individual data files
 # ---------------------------
 
 
 # get list of data files
-list.games <- list.files("data/", pattern = "_g.rds")
-list.surveys <- list.files("data/", pattern = "_s.rds")
+# list.games <- list.files("data/", pattern = "_g.rds")
+# list.surveys <- list.files("data/", pattern = "_s.rds")
+list.games <- list.files("data/", pattern = "_g.txt")
+list.surveys <- list.files("data/", pattern = "_s.txt")
+
 
 list.games <- paste0("data/", list.games)
 list.surveys <- paste0("data/", list.surveys)
@@ -21,7 +26,8 @@ list.surveys <- paste0("data/", list.surveys)
 
 
 # read in the first data frame to have a reference
-temp.game <- readRDS(list.games[1])
+#temp.game <- readRDS(list.games[1])
+temp.game <- read.table(list.games[1], header = T, sep = "\t", as.is = T)
 
 # delete the data rows that don't contain usable data (they were
 # necessary to create in the experiment code)
@@ -37,7 +43,8 @@ char.index <- c(1, 3, 5)
 for (ii in 1:length(list.games)){
   
   # read in files
-  temp.game <- readRDS(list.games[ii])
+  #temp.game <- readRDS(list.games[ii])
+  temp.game <- read.table(list.games[ii], header = T, sep = "\t", as.is = T)
   
   # save the selected option (distribution 1, 2 or 3)
   select.opt <- ifelse(temp.game$selection == 0, "0", substr(temp.game$option.order,
@@ -66,7 +73,6 @@ switch <- NULL
 condit <- NULL
 trials <- NULL
 point.cum <- NULL
-participant <- NULL
 games <- NULL
 workerids <- NULL
 outcomes <- NULL
@@ -88,7 +94,6 @@ for (xx in 1:length(list.games)){
     trial.temp <- all.game.data[,3,xx][all.game.data[,4,xx] == gam]
     outcome.temp <- all.game.data[,5,xx][all.game.data[,4,xx] == gam]
     gam.temp <- gam
-    participant.temp <- xx
     workerid.s <- as.character(all.game.data[1, 1, xx])
     workerid.temp <- workerid.s
     time.temp <- all.game.data[,7,xx][all.game.data[,4,xx] == gam]
@@ -100,7 +105,6 @@ for (xx in 1:length(list.games)){
     for (sel in 2:length(temp.select)){
       temp.switch <- c(temp.switch, ifelse(temp.select[sel-1] == temp.select[sel], 0, 1)) # 1 for switch
       temp.cond <- c(temp.cond, condi)
-      participant.temp <- c(participant.temp, xx)
       gam.temp <- c(gam.temp, gam)
       workerid.temp <- c(workerid.temp, workerid.s)
       goal.reached.temp <- c(goal.reached.temp, goal.reached.i)
@@ -113,7 +117,6 @@ for (xx in 1:length(list.games)){
     condit <- c(condit, temp.cond)
     trials <- c(trials, trial.temp)
     point.cum <- c(point.cum, points.cum.temp)
-    participant <- c(participant, participant.temp)
     games <- c(games, gam.temp)
     workerids <- c(workerids, workerid.temp)
     outcomes <- c(outcomes, outcome.temp)
@@ -132,6 +135,7 @@ names(df.long)
 names(df.long) <- c("workerid", "game", "condition", "selection", "switched", "trial",
                     "outcome", "points.cum", "resp.time", "goalReached")
 
+df.long$workerid <- as.character(df.long$workerid)
 # create new variable whether participants were, in a given trial, over the goal (1) or not (0)
 df.long$overGoal <- NA
 df.long$overGoal <- ifelse(df.long$condition %in% 3:4 &
@@ -150,7 +154,7 @@ df.long$resp.time <- as.numeric(as.character(df.long$resp.time))
 df.long$trial <- as.numeric(as.character(df.long$trial))
 df.long$points.cum <- as.numeric(as.character(df.long$points.cum))
 
-saveRDS(df.long, "DataPilotRun3/anonymousData/dataTrialLevel.rds")
+saveRDS(df.long, "data/dataTrialLevel.rds")
 
 # -------------------
 # Game Level Dataframe
@@ -168,7 +172,7 @@ aa.high.var.chosen <- aggregate(formula = high.var.chosen ~ workerid + game, FUN
                                 data = df.long)
 aa.highEV <- aggregate(formula = highEV ~ workerid + game, FUN = mean, data = df.long)
 
-df.game <- data.frame("workerid" = aa.switch$workerid,
+df.game <- data.frame("workerid" = as.character(aa.switch$workerid),
                       "game" = aa.switch$game,
                       "mean.switched" = aa.switch$switched,
                       "outcome.mean" = aa.outcome.mean$outcome,
@@ -177,6 +181,7 @@ df.game <- data.frame("workerid" = aa.switch$workerid,
                       "high.var.chosen.mean" = aa.high.var.chosen$high.var.chosen,
                       "highEV.mean" = aa.highEV$highEV)
 
+df.game$workerid <- as.character(df.game$workerid)
 df.game$condition <- NA
 
 for (kk in 1:nrow(df.game)){
@@ -188,7 +193,7 @@ df.game$goalReached <- ifelse(df.game$condition %in% 3:4,
                               ifelse(df.game$outcome.sum >= ifelse(df.game$game == 1, 30, 135),
                                      1, 0), NA)
 
-saveRDS(df.game, "DataPilotRun3/anonymousData/dataGameLevel.rds")
+saveRDS(df.game, "data/dataGameLevel.rds")
 
 # ------------------
 # Participant Level Dataframe
@@ -205,14 +210,14 @@ a.high.var.chosen <- aggregate(formula = high.var.chosen ~ workerid, FUN = mean,
 a.highEV <- aggregate(formula = highEV ~ workerid, FUN = mean, data = df.long)
 
 # create the dataframe
-df.participant <- data.frame("workerid" = a.switch$workerid,
+df.participant <- data.frame("workerid" = as.character(a.switch$workerid),
                              "mean.switched" = a.switch$switched,
                              "outcome.mean" = a.outcome.mean$outcome,
                              "outcome.sum" = a.outcome.sum$outcome,
                              "resp.time.median" = a.resp.time$resp.time,
                              "high.var.chosen.mean" = a.high.var.chosen$high.var.chosen,
                              "highEV.mean" = a.highEV$highEV)
-
+df.participant$workerid <- as.character(df.participant$workerid)
 df.participant$condition <- NA
 
 goalReachedPart <- NULL
@@ -236,13 +241,15 @@ for (kk in 1:nrow(df.participant)){
 df.participant$goalReached.mean.NP <- goalReachedPart
 
 # read in a survey dataframe as reference
-survey.df <- readRDS(list.surveys[1])
+#survey.df <- readRDS(list.surveys[1])
+survey.df <- read.table(list.surveys[1], header = T, sep = "\t", as.is = T)
 
 # loop through survey dataframes
 for (jj in 2:length(list.surveys)){
   
   # read in files and add to prepared dataframe
-  temp.surv <- readRDS(list.surveys[jj])
+  #temp.surv <- readRDS(list.surveys[jj])
+  temp.surv <- read.table(list.surveys[jj], header = T, sep = "\t", as.is = T)
   survey.df <- rbind(survey.df, temp.surv)
   
 }

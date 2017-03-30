@@ -1,3 +1,6 @@
+rm(list = ls())
+gc()
+
 # ------------------------
 # code to generate variable with predictions of Risk
 # Sensitivite Foraging Theory (RS)
@@ -142,15 +145,15 @@ for (xx in 1:nrow(df.trial)){
   if (df.trial$points.cum[xx] < 135){
     
     # for each option get a vector of values the participant has seen so far in the game
-    m1.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m1.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 1]
-    m2.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m2.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 2]
-    m3.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m3.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 3]
@@ -183,15 +186,15 @@ for (xx in 1:nrow(df.trial)){
   } else {
     #p.temp <- c(NA, NA, NA)
     # do the same for over the goal
-    m1.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m1.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 1]
-    m2.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m2.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 2]
-    m3.vec <- df.trial$outcome[df.trial$participant == df.trial$participant[xx] &
+    m3.vec <- df.trial$outcome[df.trial$workerid == df.trial$workerid[xx] &
                                  df.trial$game == df.trial$game[xx] &
                                  df.trial$trial <= df.trial$trial[xx] &
                                  df.trial$selection == 3]

@@ -1,3 +1,5 @@
+rm(list = ls())
+gc()
 # ------------------------
 # anonymize data
 # ------------------------
@@ -20,12 +22,16 @@ for (ii in 1:length(list.games)){
   temp.game <- read.table(list.games[ii], header = T, sep = ",", as.is = T)
   
   # change workerid to a number
-  temp.game$workerid <- ii
+  temp.game$workerid <- paste0("id_", ifelse(ii < 10, "00", ifelse(ii < 100, "0", "")), ii)
   
   # save the file as .rds file
-  saveRDS(temp.game, paste0("data/",
-                            ifelse(ii < 10, "00", ifelse(ii < 100, "0", "")),
-                            ii, "_g.rds"))
+  write.table(temp.game, paste0("data/",
+                                ifelse(ii < 10, "00", ifelse(ii < 100, "0", "")),
+                                ii, "_g.txt"),
+              row.names = F, sep = "\t")
+  # saveRDS(temp.game, paste0("data/",
+  #                           ifelse(ii < 10, "00", ifelse(ii < 100, "0", "")),
+  #                           ii, "_g.rds"))
 }
 
 # loop through survey files
@@ -35,15 +41,19 @@ for (jj in 1:length(list.surveys)){
   temp.surveys <- read.table(list.surveys[jj], header = T, sep = ",", as.is = T)
   
   # change workerid to a number
-  temp.surveys$workerid <- jj
+  temp.surveys$workerid <- paste0("id_", ifelse(jj < 10, "00", ifelse(jj < 100, "0", "")), jj)
   
   # get rid of condition columns, with potential personal information
   temp.surveys <- temp.surveys[, !(names(temp.surveys) %in% c("completion.code",
                                                               "comments"))]
   
   # save the file as .rds file
-  saveRDS(temp.surveys, paste0("data/",
-                               ifelse(jj < 10, "00", ifelse(jj < 100, "0", "")),
-                               jj, "_s.rds"))
+  write.table(temp.surveys, paste0("data/",
+                                   ifelse(jj < 10, "00", ifelse(jj < 100, "0", "")),
+                                   jj, "_s.txt"),
+              row.names = F, sep = "\t")
+  # saveRDS(temp.surveys, paste0("data/",
+  #                              ifelse(jj < 10, "00", ifelse(jj < 100, "0", "")),
+  #                              jj, "_s.rds"))
 }
   
