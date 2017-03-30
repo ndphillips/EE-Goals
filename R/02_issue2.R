@@ -56,6 +56,8 @@ for (cc in 1:4){
   lines(1:50, RSF.df$`sel.RSF == selection`[RSF.df$condition == cc], col = l.cols.m[1], lwd =2)
   lines(1:50, EV.df$`sel.high.EV == selection`[EV.df$condition == cc], col = l.cols.m[2], lwd =2)
   lines(1:50, high.samp.mean.df$`sel.high.samp.mean == selection`[high.samp.mean.df$condition == cc], col = l.cols.m[3], lwd =2)
+  legend("topleft", c("RSF", "EV max", "high samp mean"), lty = 1, lwd = 2,col = l.cols.m[1:3])
+         
   
 }
 
