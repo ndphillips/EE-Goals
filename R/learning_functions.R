@@ -133,11 +133,11 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   # prior.sd.start = 1            # Prior standard deviation
   # goal = 50                    # Goal
   # epsilon = .1                 # epsilon parameter for egreedy.fun
-  # theta = .5                    # theta parameter for softmax.fun  
+  # theta = .5                    # theta parameter for softmax.fun
   # alpha = .2                    # alpha updating rate for rw.fun
   # selection.strat = "softmax"   # softmax or egreedy
   # strategy = "rsf"               # Either ev or rsf
-  # plot = FALSE 
+  # plot = FALSE
   # ylim = NULL
   
   

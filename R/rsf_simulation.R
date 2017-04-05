@@ -19,8 +19,8 @@ source("r/learning_functions.R")
 # sim.dm is a design matrix of simulations. All combinations of the 
 #  parameters will be simulated
 
-sim.dm <- expand.grid(goal = c(70),                               # Goal
-                      n.trials = c(25),                           # Trials in game
+sim.dm <- expand.grid(goal = c(80),                               # Goal
+                      n.trials = c(20),                           # Trials in game
                       environment = 1:3,                          # Option environment
                       strategy = c("ev", "rsf"),                  # General strategy
                       selection.strat = c("egreedy"),  # Selection strategy
@@ -28,12 +28,12 @@ sim.dm <- expand.grid(goal = c(70),                               # Goal
 
 # Each statistical environment is defined as a dataframe of means and standard deviations
 
-environments <- list(data.frame(mean = c(3, 3),
-                                sd = c(1, 5)),
-                     data.frame(mean = c(3, 2),
-                                sd = c(1, 5)),
-                     data.frame(mean = c(2, 3),
-                                sd = c(1, 5)))
+environments <- list(data.frame(mean = c(5, 5),
+                                sd = c(1, 6)),
+                     data.frame(mean = c(5, 2),
+                                sd = c(1, 6)),
+                     data.frame(mean = c(2, 5),
+                                sd = c(1, 6)))
 
 # sim.dm.fun() runs the simulation for a given parameter combination and returns
 #   aggregate statistics
@@ -54,7 +54,7 @@ sim.dm.fun <- function(x) {
   sim.i <- rl.sim.fun(n.trials = n.trials.i,     # Trials in game
                       option.mean = option.mean.i,   # Mean of each option
                       option.sd = option.sd.i,   # SD of each option
-                      prior.exp.start = rep(0, length(option.mean)), 
+                      prior.exp.start = rep(0, length(option.mean.i)), 
                       prior.sd.start = 1,
                       goal = goal.i,
                       epsilon = .2,                        # p(explore | selection.strat = "egreedy")
@@ -110,6 +110,7 @@ sim.dm.agg <- sim.dm %>% group_by(goal, n.trials, environment, strategy) %>%
 # Plotting
 yarrr::pirateplot(reach.goal ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky ~ strategy + environment, data = sim.dm)
+#windows(height = 22, width = 33)
 yarrr::pirateplot(risky.ag ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky.ug ~ strategy + environment, data = sim.dm)
 
