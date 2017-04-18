@@ -24,16 +24,16 @@ sim.dm <- expand.grid(goal = c(90),                               # Goal
                       environment = 1:3,                          # Option environment
                       strategy = c("ev", "rsf"),                  # General strategy
                       selection.strat = c("egreedy"),  # Selection strategy
-                      sim = 1:500)                                # Simulations
+                      sim = 1:1000)                                # Simulations
 
 # Each statistical environment is defined as a dataframe of means and standard deviations
 
 environments <- list(data.frame(mean = c(3, 3),
-                                sd = c(2, 5)),
+                                sd = c(2, 8)),
                      data.frame(mean = c(3, 2),
-                                sd = c(2, 5)),
+                                sd = c(2, 8)),
                      data.frame(mean = c(2, 3),
-                                sd = c(2, 5)))
+                                sd = c(2, 8)))
 
 # sim.dm.fun() runs the simulation for a given parameter combination and returns
 #   aggregate statistics
@@ -114,5 +114,6 @@ yarrr::pirateplot(risky ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky.ag ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky.ug ~ strategy + environment, data = sim.dm)
 
-
+yarrr::pirateplot(final.points ~ strategy + environment, data = sim.dm)
+mean(sim.dm$final.points >= 90)
 

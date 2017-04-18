@@ -8,8 +8,9 @@ gc()
 # To have a better measure of when participants were closer to the goal, don't use trials as measure but the cumulative
 # points. Maybe use bins of 5 points or so to make sure to have enough datapoints to get a meaningful mean value.
 
-library(yarrr)
+if (!require(yarrr)) install.packages("yarrr"); library(yarrr)
 if (!require(binr)) install.packages("binr"); library(binr)
+
 l.cols <- piratepal(palette = 'basel', trans = .6)
 l.cols.m <- piratepal(palette = 'basel', trans = .1)
 
