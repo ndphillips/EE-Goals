@@ -19,7 +19,7 @@ source("r/learning_functions.R")
 # sim.dm is a design matrix of simulations. All combinations of the 
 #  parameters will be simulated
 
-sim.dm <- expand.grid(goal = c(90),                               # Goal
+sim.dm <- expand.grid(goal = c(100),                               # Goal
                       n.trials = c(25),                           # Trials in game
                       environment = 1:3,                          # Option environment
                       strategy = c("ev", "rsf"),                  # General strategy
@@ -28,12 +28,12 @@ sim.dm <- expand.grid(goal = c(90),                               # Goal
 
 # Each statistical environment is defined as a dataframe of means and standard deviations
 
-environments <- list(data.frame(mean = c(3, 3),
-                                sd = c(2, 8)),
-                     data.frame(mean = c(3, 2),
-                                sd = c(2, 8)),
-                     data.frame(mean = c(2, 3),
-                                sd = c(2, 8)))
+environments <- list(data.frame(mean = c(4, 4),
+                                sd = c(2.5, 11)),
+                     data.frame(mean = c(4, 2.5),
+                                sd = c(2.5, 11)),
+                     data.frame(mean = c(2.5, 4),
+                                sd = c(2.5, 11)))
 
 # sim.dm.fun() runs the simulation for a given parameter combination and returns
 #   aggregate statistics
@@ -63,7 +63,8 @@ sim.dm.fun <- function(x) {
                       plot = FALSE, 
                       strategy = strategy.i, 
                       ylim = c(0, 100),
-                      selection.strat = selection.strat.i)
+                      selection.strat = selection.strat.i,
+                      int.values = TRUE)
   
   # Extract key statistics
   option.risky <- which(option.sd.i == max(option.sd.i))
@@ -115,5 +116,5 @@ yarrr::pirateplot(risky.ag ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky.ug ~ strategy + environment, data = sim.dm)
 
 yarrr::pirateplot(final.points ~ strategy + environment, data = sim.dm)
-mean(sim.dm$final.points >= 90)
+mean(sim.dm$final.points >= 100)
 

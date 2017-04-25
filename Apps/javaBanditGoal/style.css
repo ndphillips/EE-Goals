@@ -56,6 +56,12 @@ the text on the game page */
 	user-select: none; /* Common (limited support) */
 }
 
+#goalvalue {
+	margin-left: 0em;
+	padding-left: 0em;
+	font-size: 160%;
+}
+
 /* sets font size to a higher value and 
 maybe centers the context */
 .row {
@@ -71,11 +77,15 @@ maybe centers the context */
 
 /* sets the font-size of the counters and 
 goal info on the game page to a higher value */
-#clicksRemaining, #pointCounter, #goalvalue {
+#clicksRemaining, #pointCounter {
 	font-size: 160%;
 }
 
 /* sets the color of the point counter to red */
 #pointCounter {
 	color: #FF6A6A;
+}
+
+#pEarned {
+	padding-left: 0.5em;
 }

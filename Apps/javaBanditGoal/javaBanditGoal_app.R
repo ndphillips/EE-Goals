@@ -22,8 +22,6 @@
 library(shiny)
 library(shinyjs)
 library(rdrop2)
-library(dplyr)
-library(yarrr)
 
 
 # --------------------------
@@ -44,15 +42,15 @@ sd.practice <- 2
 
 # number of draws, means and sds of the 2 options
 
-m1 <- 3
-m2 <- 2
+m1 <- 4
+m2 <- 2.5
 
-sd1 <- 2
-sd2 <- 8
+sd1 <- 2.5
+sd2 <- 11
 
 # no goal
 
-goal <- 90
+goal <- 100
 goal.practice <- 25
 
 bonus <- 150
@@ -143,7 +141,9 @@ server <- function(input, output, session) {
   CurrentValues <- reactiveValues(page = "welcome",
                                   game = 1,
                                   trials.max = nTrials,
-                                  nGoalsReached = 0)
+                                  nGoalsReached = 0,
+                                  checkFails = 0,
+                                  payout = 0)
   
   # GameValues stores vectors of histories
   GameData <- reactiveValues(trial = c(),          
@@ -253,10 +253,40 @@ server <- function(input, output, session) {
               p("You will only receive the bonus if you", strong("end"), "the game with at least as many points as the goal. This means that, even if you are above the goal in the middle of the game, if you end the game with fewer points than the goal, then you won't earn the bonus."),
               p("Again, you will play 10 different games. Your bonus across all games will be added together and determine your final monetary bonus. For example if in the 10 games you reach the goal 3 times, you will receive an extra 3 x 20 cents, i.e. 0.6$."),
               tags$br(),
-              actionButton(inputId = "gt_inst3", label = "Continue", class = "continueButtons")
+              actionButton(inputId = "gt_instCheck", label = "Continue", class = "continueButtons")
             )
         )
       )}
+    
+    # 3) INSTRUCTIONS Check
+    if (CurrentValues$page == "instCheck") {
+      
+      return(
+        div(class = "inst", checked = NA,
+            list(
+              tags$br(),
+              h2("About The Game", class = "firstRow"),
+              p("Please answer the following question from what you've learned in the instructions before. Please do", strong("not use the return button of your browser"), br(), "If your answer is incorrect you will simply be sent back to the instructions again. This will", strong("not affect your payment in any way.")),
+              tags$br(),
+              radioButtons("checkGoal",
+                           label = "What happens if you end a game with more points than the goal?",
+                           choices = list("I earn a flat bonus of 20 cents for that game." = 1,
+                                          "I earn money for the number of total points I earn, plus a bonus." = 2),
+                           selected = character(0),
+                           width = "800px"),
+              radioButtons("checkChange",
+                           label = "Can options substantially change over time?",
+                           choices = list("Yes, options can substantially change over time." = 1,
+                                          "No, while there is random variation in options, they do not substantially change over time." = 2),
+                           selected = character(0),
+                           width = "800px"),
+              tags$br(),
+              disabled(actionButton(inputId = "gt_inst3", label = "Continue", class = "continueButtons")),
+              tags$br(),tags$br(),tags$br()
+            )
+        )
+      )}
+    
     
     # 4) PRACTICE GAME INSTRUCTIONS
     
@@ -298,15 +328,14 @@ server <- function(input, output, session) {
               column(12,
                      fixedRow(tags$br()),
                      fixedRow(
-                       column(3, align="center", h3(class = "upperParams", "Clicks Remaining")),
-                       column(6, align="center", h3(class = "upperParams", "Points Earned")),
-                       column(3, align="center", h3(class = "upperParams", "Goal"))
+                       column(6, align="right", p(id = "clicksRemaining",
+                                                   paste(ifelse(CurrentValues$page == "game", nTrials, nTrialsPractice)))),
+                       column(6, align="left", h3(class = "upperParams", " Clicks Remaining"))
                      ),
                      fixedRow(
-                       column(3, align="center", p(id = "clicksRemaining",
-                                                   paste(ifelse(CurrentValues$page == "game", nTrials, nTrialsPractice)))),
-                       column(6, align="center", p(id = "pointCounter", "0")), # This is updated via JavaScript
-                       column(3, align="center", p(id = "goalvalue", paste(ifelse(CurrentValues$page == "game", goal, goal.practice))))
+                       column(5, align="right", p(id = "pointCounter", "0")), # This is updated via JavaScript
+                       column(1, align="left", p(id = "goalvalue", paste0("/", ifelse(CurrentValues$page == "game", goal, goal.practice)))),
+                       column(6, align="left", h3(id = "pEarned", class = "upperParams", "Points Earned"))
                      ),
                      fixedRow(tags$br()),
                      fixedRow(
@@ -315,13 +344,13 @@ server <- function(input, output, session) {
                        column(5, align="center",
                               HTML('<h1 id="deck1" class="decks" onclick="updateValue(\'deck1\', \'deck2\', \'pointCounter\',
                                   \'clicksRemaining\', ens, eno, env, ent, ind, 1, outcome, outcomeCum, selection, nTrials, gameNr,
-                                  respTime, trial, t, goal)"> </h1>')),
+                                  respTime, trial, t, goal, clickEnabled)"> </h1>')),
                       # column(2, align="center",
                       #        HTML('<p id="emptySpace2" class="emptySpace">Place</p>')),
                       column(5, align="center",
                              HTML('<h1 id="deck2" class="decks" onclick="updateValue(\'deck2\', \'deck1\', \'pointCounter\',
                                   \'clicksRemaining\', env, ent, ens, eno, ind, 2, outcome, outcomeCum, selection, nTrials, gameNr, respTime,
-                                  trial, t, goal)"> </h1>')),
+                                  trial, t, goal, clickEnabled)"> </h1>')),
                       column(1, align="center",
                              HTML('<h1 id="emptySpace2" class="emptySpace">Place</h1>'))),
 
@@ -385,10 +414,19 @@ server <- function(input, output, session) {
               p(paste("You earned", GameData$points.cum[length(GameData$points.cum)], "points in the game.")),
               if (GameData$points.cum[length(GameData$points.cum)] < goal){p(paste("Your goal was", goal, "points. Because you did not reach the goal you do"), strong(" not "), paste("earn the 20 cents bonus for this game."))},
               if (GameData$points.cum[length(GameData$points.cum)] >= goal){p(paste("Your goal was", goal, "points. Because you"), strong(" did "), paste("reach the goal you earn the 20 cents bonus for this game."))},
-              p(strong(paste0("You have now finished playing all 10 games. You have reached the goal ", CurrentValues$nGoalsReached, " times. Thus you receive an extra monetary bonus of ", CurrentValues$nGoalsReached, " x 20 cents, that is ", CurrentValues$nGoalsReached * .2, " $."))),
+              p(strong(paste0("You have now finished playing all 10 games. You have reached the goal ", CurrentValues$nGoalsReached, " times."), br(), paste0("Thus you receive an extra monetary bonus of ", CurrentValues$nGoalsReached, " x 20 cents, that is ", CurrentValues$payout, " $."))),
               tags$br(),
-              actionButton(inputId = "gt_part2Inst", 
-                           label = "Continue", class = "continueButtons"))))
+              h3("Please answer the following question about the two options."),
+              radioButtons("which.high.ev",
+                           label = "You may have noticed that in each game, there was one option with a larger variability of outcomes, and one option with a smaller variability. Do you think one of these options had, on average, better points than the other?",
+                           choices = list("I think the option with the higher point variability also had higher values on average." = 1,
+                                          "I think the option with the lower point variability had higher values on average." = 2,
+                                          "I think both options gave the same number of points on average." = 3),
+                           selected = character(0),
+                           width = "800px"),
+              tags$br(),
+              disabled(actionButton(inputId = "gt_part2Inst", 
+                           label = "Continue", class = "continueButtons")))))
     }
     
     if (CurrentValues$page == "part2Inst") {
@@ -418,7 +456,17 @@ server <- function(input, output, session) {
   observeEvent(input$gt_inst1, {CurrentValues$page <- "inst1"})
   observeEvent(input$gt_inst2, {CurrentValues$page <- "inst2"})
   observeEvent(input$gt_goalInst, {CurrentValues$page <- "goalInst"})
-  observeEvent(input$gt_inst3, {CurrentValues$page <- "inst3"})
+  observeEvent(input$gt_instCheck, {CurrentValues$page <- "instCheck"})
+  observeEvent(input$gt_inst3, {
+    if (!is.null(input$checkGoal)){
+      if (input$checkChange == 2 & input$checkGoal == 1) {
+        CurrentValues$page <- "inst3"
+      } else {
+        CurrentValues$page <- "inst2"
+        CurrentValues$checkFails <- CurrentValues$checkFails + 1
+      }
+    }
+  })
   observeEvent(input$gt_practicegame, {CurrentValues$page <- "practicegame"})
   observeEvent(input$continueGame, {
     if (CurrentValues$game == 1){
@@ -426,6 +474,7 @@ server <- function(input, output, session) {
     } else { if (CurrentValues$game %in% c(2:(n.games - 1))){
       CurrentValues$page <- "pageEndGame"
     } else {
+      CurrentValues$payout <- CurrentValues$nGoalsReached * .2
       CurrentValues$page <- "lastEndGame"
     }
     }
@@ -486,6 +535,14 @@ server <- function(input, output, session) {
       }
     }
   })
+  
+  observeEvent(input$checkChange, {
+    enable("gt_inst3")
+  })
+  
+  observeEvent(input$which.high.ev, {
+    enable("gt_part2Inst")
+  })
 
   
   # --------------------------------
@@ -508,7 +565,11 @@ server <- function(input, output, session) {
                                             "option.order" = option.order,
                                             "workerid" = input$workerid,
                                             "goal" = goal,
-                                            "condition" = condition)
+                                            "condition" = condition,
+                                            "n.goals.reached" = CurrentValues$nGoalsReached,
+                                            "check.fails" = CurrentValues$checkFails,
+                                            "payout" = CurrentValues$payout,
+                                            "which.high.ev" = input$which.high.ev)
                    
                    
                    incProgress(.5)
