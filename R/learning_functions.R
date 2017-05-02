@@ -249,6 +249,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
          if(mean(is.finite(p.getthere)) == 1) {
          
          if(sum(p.getthere) == 0) {
+           
            selprob.i <- rep(1 / n.options, n.options)} else {
          
       selprob.i <- p.getthere / sum(p.getthere)
@@ -261,7 +262,6 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
        
        if(selection.strat == "egreedy") {
          
-    
          selprob.i <- egreedy.fun(p.getthere, epsilon)
          
        }
