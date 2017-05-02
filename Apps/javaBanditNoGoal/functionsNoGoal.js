@@ -69,13 +69,16 @@ the game data will be saved. */
 	outcomeCum = [];
 
 	// time reference for the first trial
-	t = new Date().getTime();
+	t = [Date.now()];
 
 	// array to store the response times 
 	respTime = [];
 
 	// array to store trial number
 	trial = [];
+
+	// this controls the reaction timeout of the buttons to ensure that people don't go through it too fast
+	clickEnabled = [1];
 }
 
 function add(a, b) {
@@ -86,73 +89,84 @@ function add(a, b) {
 }
 
 
-function updateValue(elmtG, elmtGO, elmtP, elmtC, distd, dist, distdd, distddd, ind, sel, outcome, outcomeCum, selection, nTrials, gameNr, respTime, trial, t){
+function updateValue(elmtG, elmtGO, elmtP, elmtC, distd, dist, distdd, distddd, ind, sel, outcome, outcomeCum, selection, nTrials, gameNr, respTime, trial, t, clickEnabled){
 	/* this function is the heart of the game. It gets the value of the selected option and changes the 
 	html tag to this value to display it. It then appends the relevant parameters to the different arrays. */
 
 	// only do this if trial number is smaller than maximum number of trials. This ensures that the game stops at nTrials
 	if (ind.length < nTrials){
 
-		// first compute the response time
-		if (ind.length === 0){
-			respTime.push(new Date().getTime() - t);
-		} else {
-			respTime.push(new Date().getTime() - respTime[(respTime.length - 1)]);
-		}
+		if (clickEnabled[clickEnabled.length - 1] === 1){
 
-		// select the different html tags that are to be changed
-		var element = document.getElementById(elmtG);
-		var otherelement = document.getElementById(elmtGO);
-		var pointsP = document.getElementById(elmtP);
-		var clicksP = document.getElementById(elmtC);
+			// get reaction Time
+			var clickedRT = Date.now()
 
-		// set the color of the displayed outcome value
-		if (dist[ind.length] === 0) {
-			var color = "#BEBEBE";
-		} else if (dist[ind.length] < 0) {
-			var color = "#FF6A6A";
-			} else {
-				var color = "#00CD00";
-		}
+			// disable reaction to clicks
+			clickEnabled.push(0);
 
-		// select the outcome value and display it in the specified color
-		element.innerHTML = dist[ind.length];
-		element.style.color = color;
+			// first compute the response time
+			respTime.push((clickedRT - t[t.length - 1]) / 1000);
+			t.push(clickedRT);
 
-		// make sure in the other element nothing is displayed
-		if (selection[selection.lenth] != sel){
-			otherelement.innerHTML = ' ';
-		}
-		
-		// append selected option to selection array
-		selection.push(sel);
+			// select the different html tags that are to be changed
+			var element = document.getElementById(elmtG);
+			var otherelement = document.getElementById(elmtGO);
+			var pointsP = document.getElementById(elmtP);
+			var clicksP = document.getElementById(elmtC);
 
-		// append outcome to outcome array
-		outcome.push(dist[ind.length]);
+			// set the color of the displayed outcome value
+			if (dist[ind.length] === 0) {
+				var color = "#BEBEBE";
+			} else if (dist[ind.length] < 0) {
+				var color = "#FF6A6A";
+				} else {
+					var color = "#00CD00";
+			}
 
-		// append trial number to trial array
-		trial.push(ind.length + 1);
+			// select the outcome value and display it in the specified color
+			element.innerHTML = dist[ind.length];
+			element.style.color = color;
 
-		// update the displayed clicks counter on the game page
-		clicksP.innerHTML = nTrials - (ind.length + 1);
+			// make sure in the other element nothing is displayed
+			if (selection[selection.lenth] != sel){
+				otherelement.innerHTML = ' ';
+			}
+			
+			// append selected option to selection array
+			selection.push(sel);
 
-		// append cumulative outcome values to outcomeCum array
-		outcomeCum.push(outcome.reduce(add, 0));
+			// append outcome to outcome array
+			outcome.push(dist[ind.length]);
 
-		// append one to index array
-		ind.push(1);
+			// append trial number to trial array
+			trial.push(ind.length + 1);
 
-		// append game number to gameNr array
-		if (gameNr.length < nTrials){
-			gameNr.push(gameNr[0]);
-		}
+			// update the displayed clicks counter on the game page
+			clicksP.innerHTML = nTrials - (ind.length + 1);
 
-		// change the displayed total point value to new value
-		pointsP.innerHTML = outcomeCum[outcomeCum.length - 1];
+			// append cumulative outcome values to outcomeCum array
+			outcomeCum.push(outcome.reduce(add, 0));
 
-		// if this was the last trial send the gathered data back to the server
-		if (ind.length === nTrials){
-			endGame(selection, outcome, outcomeCum, respTime, trial, gameNr);
+			// append one to index array
+			ind.push(1);
+
+			// append game number to gameNr array
+			if (gameNr.length < nTrials){
+				gameNr.push(gameNr[0]);
+			}
+
+			// change the displayed total point value to new value
+			pointsP.innerHTML = outcomeCum[outcomeCum.length - 1];
+
+			// if this was the last trial send the gathered data back to the server
+			if (ind.length === nTrials){
+				endGame(selection, outcome, outcomeCum, respTime, trial, gameNr);
+			}
+
+			// wait 0.5 seconds and then enable click again
+			setTimeout(function(){
+				clickEnabled.push(1);
+			}, 500);
 		}
 	}
 }

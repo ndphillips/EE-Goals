@@ -121,6 +121,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
                        alpha = .2,                    # alpha updating rate for rw.fun
                        selection.strat = "egreedy",   # softmax or egreedy
                        strategy = "ev",               # Either ev or rsf
+                       int.values = FALSE,
                        plot = FALSE, 
                        ylim = NULL) {
   
@@ -147,12 +148,22 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   # Create outcome matrix giving the outcome on each trial for each option
   outcome.mtx <- matrix(NA, nrow = n.trials, ncol = n.options)
   
-  for(option.i in 1:n.options) {
-    
-    outcome.mtx[,option.i] <- rnorm(n = n.trials, 
-                                    mean = option.mean[option.i], 
-                                    sd = option.sd[option.i])
-    
+  if (int.values == FALSE){
+    for(option.i in 1:n.options) {
+      
+      outcome.mtx[,option.i] <- rnorm(n = n.trials, 
+                                      mean = option.mean[option.i], 
+                                      sd = option.sd[option.i])
+      
+    }
+  } else {
+    for(option.i in 1:n.options) {
+      
+      outcome.mtx[,option.i] <- round(rnorm(n = n.trials, 
+                                      mean = option.mean[option.i], 
+                                      sd = option.sd[option.i]))
+      
+    }
   }
   
   # Create exp.prior and exp.new matrices
