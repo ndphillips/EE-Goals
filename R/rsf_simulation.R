@@ -19,12 +19,15 @@ source("r/learning_functions.R")
 # sim.dm is a design matrix of simulations. All combinations of the 
 #  parameters will be simulated
 
-sim.dm <- expand.grid(goal = c(100),                               # Goal
+
+sim.dm <- expand.grid(goal = c(80),                               # Goal
                       n.trials = c(25),                           # Trials in game
                       environment = 1:3,                          # Option environment
                       strategy = c("ev", "rsf"),                  # General strategy
                       selection.strat = c("egreedy"),  # Selection strategy
+
                       sim = 1:1000)                                # Simulations
+
 
 # Each statistical environment is defined as a dataframe of means and standard deviations
 
