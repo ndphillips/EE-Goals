@@ -120,7 +120,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
                        theta = .5,                    # theta parameter for softmax.fun  
                        alpha = .2,                    # alpha updating rate for rw.fun
                        selection.strat = "egreedy",   # softmax or egreedy
-                       strategy = "ev",               # Either ev or rsf
+                       strategy = "ev",               # Either ev or rsf or random
                        int.values = FALSE,
                        plot = FALSE, 
                        ylim = NULL) {
@@ -178,6 +178,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   
   selection.v <- rep(NA, n.trials)      # Actual selections
   outcome.v <- rep(NA, n.trials)        # Actual outcomes
+  diff.pred.v <- rep(NA, n.trials)        # differences in prediction
   selprob.mtx <- as.data.frame(matrix(NA,             # Selection probabilities
                         nrow = n.trials, 
                         ncol = n.options))
@@ -229,6 +230,20 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
       
     selprob.i <- softmax.fun(exp.current = exp.prior.i, 
                              theta = theta)
+    
+    # differences in prediction
+    if(mean(is.finite(p.getthere)) == 1) {
+      
+      if(sum(p.getthere) == 0) {
+        
+        selprob.diff <- rep(1 / n.options, n.options)} else {
+          
+          selprob.diff <- p.getthere / sum(p.getthere)
+          
+        }
+      
+    } else {selprob.i <- rep(1 / n.options, n.options)}
+    
       }
       
       
@@ -236,6 +251,10 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
         
         selprob.i <- egreedy.fun(exp.current = exp.prior.i, 
                                  epsilon = epsilon)
+        
+        # differences in prediction
+        
+        selprob.diff <- egreedy.fun(p.getthere, epsilon)
         
       }
     
@@ -258,20 +277,41 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
            
          } else {selprob.i <- rep(1 / n.options, n.options)}
       
+         # differences in prediction
+         selprob.diff <- softmax.fun(exp.current = exp.prior.i, 
+                                  theta = theta)
        }
        
        if(selection.strat == "egreedy") {
          
          selprob.i <- egreedy.fun(p.getthere, epsilon)
          
+         # differences in prediction
+         selprob.diff <- egreedy.fun(exp.current = exp.prior.i, 
+                                  epsilon = epsilon)
        }
       
     }
     
-    
+    # Random strategy: Select at random (this is ensured by theta = 0)
+    if(strategy == "random") {
+      
+        
+      selprob.i <- rep(1 / n.options, n.options)
+      
+    }
     # Select an option
     
     selection.i <- sample(1:n.options, size = 1, prob = selprob.i)
+    
+    # differences in prediction
+    if(strategy %in% c("ev", "rsf")){
+      selection.diff <- sample(1:n.options, size = 1, prob = selprob.diff)
+      
+      diff.pred.i <- ifelse(selection.i == selection.diff, 0, 1)
+    } else {
+      diff.pred.i = NA
+    }
     
     # Get outcome from selected option
     
@@ -307,6 +347,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
     outcome.v[trial.i] <- outcome.i     # Actual outcome
     reward.mtx[trial.i, selection.i] <- outcome.i
     gt.mtx[trial.i,] <- p.getthere
+    diff.pred.v[trial.i] <- diff.pred.i
   }
   
   # Put main results in a single dataframe called sim.result.df
@@ -314,6 +355,7 @@ rl.sim.fun <- function(n.trials = 100,                # Trials in game
   sim.result.df <- data.frame("selection" = selection.v, 
                               "outcome" = outcome.v,
                               "outcome.cum" = cumsum(outcome.v),
+                              "diff.pred" = diff.pred.v,
                               stringsAsFactors = FALSE)
   
   sim.result.df <- cbind(sim.result.df, selprob.mtx, gt.mtx)

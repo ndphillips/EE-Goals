@@ -34,9 +34,9 @@ server <- function(input, output, session) {
 # --------------------------
 
 EPtoken <- readRDS("EP_droptoken.rds")          # Reads in authentication for EP dropbox
-outputDir <- "msteiner/GoalBandit/data"          # Determine dropbox output folder
-idDir <- "msteiner/GoalBandit/ids"
-expContrDir <- "msteiner/GoalBandit/expControll"
+outputDir <- "msteiner/GoalBanditJava/data"          # Determine dropbox output folder
+idDir <- "msteiner/GoalBanditJava/ids"
+expContrDir <- "msteiner/GoalBanditJava/expControll"
 
 
 # --------------------------
