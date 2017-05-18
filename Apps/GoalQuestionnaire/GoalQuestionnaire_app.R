@@ -211,7 +211,6 @@ if (CurrentValues$page == 19) {
   return(
     div(class = "page19", checked = NA,
     list(
-      p("Please answer the following questions truthfully to help us with our research.", br(), em("Your answer will NOT affect your reward or bonus!!"), br(), class = "firstRow", id = "affectReward"),
       radioButtons("gaveUp",
                    label = "Did you give up and stop caring about earning points at any time during the games?",
                    choices = list("Never. I never gave up trying to earn as many points as possible" = 1,
