@@ -1,0 +1,2 @@
+"workerid"	"age"	"sex"	"game.difficulty"	"strategy"	"strategy.change"	"which.strategy"	"instructions.clear"	"similar.task"	"not.understood"	"error.or.bugs"	"describeError"	"gave.up"	"tookNotes"	"usedCalculator"	"got.help"	"BNT"	"knewBNT"	"interesting"	"education"	"attention.check"	"trust.data"	"foundHIT"	"text.attention.check"	"condition"	"caredReachGoal"
+"id_094"	21	2	2	"eD"	"8Z9ve.j12x,oy"	2	1	1	"g70v2pqK0l7SsIkCLb.lc5R"	1	"9yTJKMnxjjBQQ"	2	2	2	2	55.0351999385748	2	5	3	3	1	1	NA	4	3

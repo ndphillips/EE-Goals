@@ -20,10 +20,10 @@ source("r/learning_functions.R")
 #  parameters will be simulated
 
 
-sim.dm <- expand.grid(goal = c(80),                               # Goal
+sim.dm <- expand.grid(goal = c(0),                               # Goal
                       n.trials = c(25),                           # Trials in game
                       environment = 1:3,                          # Option environment
-                      strategy = c("ev", "rsf"),                  # General strategy
+                      strategy = c("ev", "rsf", "random"),        # General strategy
                       selection.strat = c("egreedy"),  # Selection strategy
 
                       sim = 1:1000)                                # Simulations
@@ -62,7 +62,7 @@ sim.dm.fun <- function(x) {
                       goal = goal.i,
                       epsilon = .2,                        # p(explore | selection.strat = "egreedy")
                       theta = 1, 
-                      alpha = .2,
+                      alpha = .3,
                       plot = FALSE, 
                       strategy = strategy.i, 
                       ylim = c(0, 100),
@@ -75,6 +75,7 @@ sim.dm.fun <- function(x) {
   final.points.i <- sim.i$outcome.cum[n.trials.i]
   reach.goal.i <- final.points.i > goal.i
   risky.i <- mean(sim.i$selection == option.risky)
+  diff.pred.i <- mean(sim.i$diff.pred)
   
   # choosing risky option when above goal (ag) or under goal (ug)
   risky.ug.i <- mean(sim.i$selection[sim.i$outcome.cum < goal.i] == option.risky)
@@ -84,7 +85,8 @@ sim.dm.fun <- function(x) {
                        "reach.goal" = reach.goal.i,
                        "risky" = risky.i,
                        "risky.ug" = risky.ug.i,
-                       "risky.ag" = risky.ag.i)
+                       "risky.ag" = risky.ag.i,
+                       "diff.pred" = diff.pred.i)
    
   return(output)
   
@@ -119,5 +121,8 @@ yarrr::pirateplot(risky.ag ~ strategy + environment, data = sim.dm)
 yarrr::pirateplot(risky.ug ~ strategy + environment, data = sim.dm)
 
 yarrr::pirateplot(final.points ~ strategy + environment, data = sim.dm)
+yarrr::pirateplot(diff.pred ~ strategy + environment, data = sim.dm)
+
 mean(sim.dm$final.points >= 100)
+mean(sim.dm$diff.pred, na.rm = T)
 

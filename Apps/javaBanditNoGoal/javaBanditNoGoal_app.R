@@ -56,10 +56,12 @@ goal.practice <- 0
 bonus <- 150
 
 # mean and sd of the payout dist
-
-mean.payout.dist <- 900
+mean.payout.dist <- 850
 sd.payout.dist <- 100
 
+# set the mean and sd for the bonus distribution
+mean.bonus <- .8
+sd.bonus <- .15
 
 # Option outcomes as a list
 outcomes <- list()
@@ -434,7 +436,7 @@ server <- function(input, output, session) {
     } else { if (CurrentValues$game %in% c(2:(n.games - 1))){
       CurrentValues$page <- "pageEndGame"
     } else {
-      CurrentValues$payout <- round((CurrentValues$totalPoints - mean.payout.dist) / sd.payout.dist, 2)
+      CurrentValues$payout <- round(((CurrentValues$totalPoints - mean.payout.dist) / sd.payout.dist) * sd.bonus + mean.bonus, 2)
       CurrentValues$page <- "lastEndGame"
     }
     }

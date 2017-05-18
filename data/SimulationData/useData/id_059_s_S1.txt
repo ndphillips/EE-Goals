@@ -1,0 +1,2 @@
+"workerid"	"age"	"sex"	"game.difficulty"	"strategy"	"strategy.change"	"which.strategy"	"instructions.clear"	"similar.task"	"not.understood"	"error.or.bugs"	"describeError"	"gave.up"	"tookNotes"	"usedCalculator"	"got.help"	"BNT"	"knewBNT"	"interesting"	"education"	"attention.check"	"trust.data"	"foundHIT"	"text.attention.check"	"condition"	"caredReachGoal"
+"id_059"	40	1	4	"kU9oQAEip,vdihRfe48NiD3f.kxBvmx.oOxn"	"Vw g0hSUrY"	2	2	1	"lpqojxwJbH27ERcH1MY28"	2	"7JpNVtYLYgnVlSEOFw3I2eOqJGbwkcWg"	2	2	2	2	10.0773639981635	2	4	3	3	1	1	"I read the instructions"	1	NA

@@ -1,0 +1,2 @@
+"workerid"	"age"	"sex"	"game.difficulty"	"strategy"	"strategy.change"	"which.strategy"	"instructions.clear"	"similar.task"	"not.understood"	"error.or.bugs"	"describeError"	"gave.up"	"tookNotes"	"usedCalculator"	"got.help"	"BNT"	"knewBNT"	"interesting"	"education"	"attention.check"	"trust.data"	"foundHIT"	"text.attention.check"	"condition"	"caredReachGoal"
+"id_302"	38	1	5	"1,5jWS.BQ,,O"	"NeG"	1	1	2	"IqUCj"	1	"SHvudwEl0zC1effz"	2	2	2	1	79.9628819737118	2	3	4	3	1	1	"didn't read!!!"	4	3
