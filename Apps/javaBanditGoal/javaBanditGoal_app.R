@@ -190,7 +190,7 @@ server <- function(input, output, session) {
               h3("If the page crashes, email us at turkpsych@gmail.com"),
               p("Please note that we are running this HIT on a server that occasionally, but rarely, crashes. If the page crashes while you are completing it, it is important that you let us know right away. If this happens please email us at turkpsych@gmail.com and we will give you further instructions."),
               h3("Read instructions carefully!"),
-              p("On the next page we explain how the Boxes game works. Please read the instructions carefully.  The better you understand the instructions, the more points you will earn in the games."),
+              p("On the next page we explain how the Boxes game works. Please read the instructions carefully. The better you understand the instructions, the better you will do."),
               tags$br(),
               actionButton(inputId = "gt_inst2", 
                            label = "Continue", class = "continueButtons") 
@@ -258,7 +258,7 @@ server <- function(input, output, session) {
             list(
               tags$br(),
               h2("Did you understand the rules?", class = "firstRow"),
-              p("Before you start the game, we'd like to make sure you understood the instructions. Please answer the following question from what you've learned in the instructions before. Please do", strong("not use the return button of your browser"), br(), "If your answer is incorrect you will simply be sent back to the instructions again."),
+              p("Before you start the game, we'd like to make sure you understood the instructions. Please answer the following questions from what you've learned in the instructions before. Please do", strong("not use the return button of your browser"), br(), "If your answer is incorrect you will simply be sent back to the instructions again."),
               tags$br(),
               radioButtons("checkGoal",
                            label = "What happens if I end a game with l00 points or more?",
