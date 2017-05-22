@@ -1,2 +1,2 @@
 "workerid"	"age"	"sex"	"game.difficulty"	"strategy"	"strategy.change"	"which.strategy"	"instructions.clear"	"similar.task"	"not.understood"	"error.or.bugs"	"describeError"	"gave.up"	"tookNotes"	"usedCalculator"	"got.help"	"BNT"	"knewBNT"	"interesting"	"education"	"attention.check"	"trust.data"	"foundHIT"	"text.attention.check"	"condition"	"caredReachGoal"
-"id_198"	20	2	1	"Fj"	"grJamcw,vfjI3F CVcu0P"	2	1	2	"h,Qj1OGNbKRS9gT2iFBeGk01b3"	2	"7u52lPfFz.4EQE3PRrobrQ9VN21bnDbkOJ"	2	2	2	2	25	1	5	6	1	1	1	NA	1	NA
+"id_198"	31	2	5	"4y0ljg8Kr3bGT.GYffiw1A0eH.O.1YjYwR"	"6ZA1ym73I1IacuaPOhmYjqSlGNQw"	2	1	2	"znFHVPI1W"	2	"Al2QTxcZeK0S.zWCblHP3dl6,zC4WmBeyJmQKw"	1	2	1	2	14.8888866119087	2	1	4	1	1	1	"didn't read!!!"	3	NA
