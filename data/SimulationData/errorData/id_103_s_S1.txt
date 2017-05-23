@@ -1,2 +1,0 @@
-"workerid"	"age"	"sex"	"game.difficulty"	"strategy"	"strategy.change"	"which.strategy"	"instructions.clear"	"similar.task"	"not.understood"	"error.or.bugs"	"describeError"	"gave.up"	"tookNotes"	"usedCalculator"	"got.help"	"BNT"	"knewBNT"	"interesting"	"education"	"attention.check"	"trust.data"	"foundHIT"	"text.attention.check"	"condition"	"caredReachGoal"
-"id_103"	53	2	4	"VWH, exStOexCV"	"JmGchb,kk79qRMj5IuqmQO1GHU IA2"	1	1	1	"WXISgEasy0KJ6X3 jk .gqSR"	1	"rTwobQ9NttYB4MZsvqoPwC503jnE7boQXCq"	2	2	2	2	25	2	4	4	3	1	1	NA	6	3

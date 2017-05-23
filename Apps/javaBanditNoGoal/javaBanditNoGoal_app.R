@@ -304,13 +304,13 @@ server <- function(input, output, session) {
                        column(5, align="center",
                               HTML('<h1 id="deck1" class="decks" onclick="updateValue(\'deck1\', \'deck2\', \'pointCounter\',
                                   \'clicksRemaining\', ens, eno, env, ent, ind, 1, outcome, outcomeCum, selection, nTrials, gameNr,
-                                  respTime, trial, t)"> </h1>')),
+                                  respTime, trial, t, clickEnabled)"> </h1>')),
                       # column(2, align="center",
                       #        HTML('<p id="emptySpace2" class="emptySpace">Place</p>')),
                       column(5, align="center",
                              HTML('<h1 id="deck2" class="decks" onclick="updateValue(\'deck2\', \'deck1\', \'pointCounter\',
                                   \'clicksRemaining\', env, ent, ens, eno, ind, 2, outcome, outcomeCum, selection, nTrials, gameNr, respTime,
-                                  trial, t)"> </h1>')),
+                                  trial, t, clickEnabled)"> </h1>')),
                       column(1, align="center",
                              HTML('<h1 id="emptySpace2" class="emptySpace">Place</h1>'))),
 
@@ -430,7 +430,7 @@ server <- function(input, output, session) {
     } else { if (CurrentValues$game %in% c(2:(n.games - 1))){
       CurrentValues$page <- "pageEndGame"
     } else {
-      CurrentValues$payout <- round(((CurrentValues$totalPoints - mean.payout.dist) / sd.payout.dist) * sd.bonus + mean.bonus, 2)
+      CurrentValues$payout <- round(CurrentValues$totalPoints / 1000, 2)
       CurrentValues$page <- "lastEndGame"
     }
     }

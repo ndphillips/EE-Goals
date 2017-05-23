@@ -47,7 +47,7 @@ fil <- list.files("data/SimulationData/ids/", full.names = T)
 
 ## read in the id files and save the ids in a matrix
 
-# prepare matris
+# prepare matrix
 ids <- matrix(NA, ncol = 1, nrow = length(fil))
 
 # read in files and save in matrix
@@ -107,7 +107,7 @@ for (ii in 1:length(list.games)){
   temp.game <- read.table(list.games[ii], header = T, sep = ",", as.is = T)
   
   # check response times for exclusion criteria
-  mean.max.time <- mean(temp.game$time > 1.5, na.rm = T)
+  mean.max.time <- mean(temp.game$time > 2, na.rm = T)
   
   mean.min.time <- mean(temp.game$time < 0.55, na.rm = T)
   
@@ -361,8 +361,7 @@ for (xx in 1:length(list.games)){
     which.high.ev.s <- all.game.data[1, 11, xx]
     which.high.ev.temp <- which.high.ev.s
     time.temp <- all.game.data[,7,xx][all.game.data[,4,xx] == gam]
-    goal.reached.i <- ifelse(condi %in% 4:6,
-                             ifelse(as.numeric(points.cum.temp[length(points.cum.temp)]) >= 100, 1, 0), NA)
+    goal.reached.i <- ifelse(as.numeric(points.cum.temp[length(points.cum.temp)]) >= 100, 1, 0)
     goal.reached.temp <- goal.reached.i
     
     # loop through trials in a game
@@ -408,8 +407,7 @@ names(df.long) <- c("id", "game", "condition", "selection", "switched", "trial",
 df.long$id <- as.character(df.long$id)
 # create new variable whether participants were, in a given trial, over the goal (1) or not (0)
 df.long$overGoal <- NA
-df.long$overGoal <- ifelse(df.long$condition %in% 4:6 &
-                             as.numeric(as.character(df.long$points.cum)) >= 100, 1, 0)
+df.long$overGoal <- ifelse(as.numeric(as.character(df.long$points.cum)) >= 100, 1, 0)
 
 # create new variable whether participants in a given trial chose the high variance option
 df.long$high.var.chosen <- ifelse(df.long$selection == "2", 1, 0)
@@ -503,20 +501,20 @@ for (xx in 1:nrow(df.long)){
   # for each option get a vector of values the participant has seen so far in the game
   m1.vec <- df.long$outcome[df.long$id == df.long$id[xx] &
                                df.long$game == df.long$game[xx] &
-                               df.long$trial <= df.long$trial[xx] &
+                               df.long$trial < df.long$trial[xx] &
                                df.long$selection == 1]
   
   m2.vec <- df.long$outcome[df.long$id == df.long$id[xx] &
                                df.long$game == df.long$game[xx] &
-                               df.long$trial <= df.long$trial[xx] &
+                               df.long$trial < df.long$trial[xx] &
                                df.long$selection == 2]
   
   # compute mean and sds for this vector
-  m1 <- ifelse(length(m1.vec) > 0, mean(m1.vec, na.rm = T), 0)
-  m2 <- ifelse(length(m2.vec) > 0, mean(m2.vec, na.rm = T), 0)
+  m1 <- ifelse(length(m1.vec) > 0, mean(m1.vec, na.rm = TRUE), 0)
+  m2 <- ifelse(length(m2.vec) > 0, mean(m2.vec, na.rm = TRUE), 0)
   
-  sd1 <- ifelse(length(m1.vec) > 0, sd(m1.vec, na.rm = T), 1)
-  sd2 <- ifelse(length(m2.vec) > 0, sd(m2.vec, na.rm = T), 1)
+  sd1 <- ifelse(length(m1.vec) > 1, sd(m1.vec, na.rm = TRUE), 1)
+  sd2 <- ifelse(length(m2.vec) > 1, sd(m2.vec, na.rm = TRUE), 1)
   
   # append to a vector to use later
   sub.mean1 <- c(sub.mean1, m1)
@@ -537,34 +535,13 @@ for (xx in 1:nrow(df.long)){
 }
 
 # the probabilities were calculated with complete information of points in a trial
-# i.e. the obtained probability is the one for the next trial. Thus we have to 
-# reposition everything by one.
-o1.vec <- c(NA, o1.vec)
-o2.vec <- c(NA, o2.vec)
-
-o1.vec <- o1.vec[-length(o1.vec)]
-o2.vec <- o2.vec[-length(o2.vec)]
+# i.e. the obtained probability is the one for the next trial.
 
 df.long$p.getthere.1 <- o1.vec
 df.long$p.getthere.2 <- o2.vec
 
-df.long$p.getthere.1[df.long$trial == 1] <- NA
-df.long$p.getthere.2[df.long$trial == 1] <- NA
-
-# reposition by one
-o1.vec.sub <- c(NA, o1.vec.sub)
-o2.vec.sub <- c(NA, o2.vec.sub)
-
-
-o1.vec.sub <- o1.vec.sub[-length(o1.vec.sub)]
-o2.vec.sub <- o2.vec.sub[-length(o2.vec.sub)]
-
-
 df.long$p.getthere.1.subj <- o1.vec.sub
 df.long$p.getthere.2.subj <- o2.vec.sub
-
-df.long$p.getthere.1.subj[df.long$trial == 1] <- NA
-df.long$p.getthere.2.subj[df.long$trial == 1] <- NA
 
 # append subjective mean vectors
 df.long$subj.mean.1 <- sub.mean1
@@ -573,6 +550,8 @@ df.long$subj.mean.2 <- sub.mean2
 # prepare objects
 choose.highvar <- NULL
 choose.highvar.subj <- NULL
+pred.EV <- NULL
+pred.RSF <- NULL
 
 # for objective and subjective p.getthere values, create vectors containing 1, when the p.getthere value for the 
 # high variance option is higher than for the low variance option, and 0 otherwise
@@ -583,16 +562,22 @@ for (jj in 1:nrow(df.long)){
     
     choose.highvar.subj <- c(choose.highvar.subj,
                              ifelse(df.long$p.getthere.2.subj[jj] > df.long$p.getthere.1.subj[jj], 1, 0))
+    
+    pred.EV <- c(pred.EV, ifelse(df.long$subj.mean.1[jj] > df.long$subj.mean.2[jj], 1,
+                                 ifelse(df.long$subj.mean.1[jj] == df.long$subj.mean.2[jj], sample(1:2, 1), 2)))
+    
+    pred.RSF <- c(pred.RSF, ifelse(df.long$p.getthere.1.subj[jj] > df.long$p.getthere.2.subj[jj], 1,
+                                 ifelse(df.long$p.getthere.1.subj[jj] == df.long$p.getthere.2.subj[jj], sample(1:2, 1), 2)))
 
 }
 
 # append to dataframe
 df.long$choose.highvar <- choose.highvar
 df.long$choose.highvar.subj <- choose.highvar.subj
-
-
-
-
+df.long$pred.EV <- pred.EV
+df.long$pred.RSF <- pred.RSF
+df.long$pred.EV.acc <- ifelse(df.long$selection == df.long$pred.EV, 1, 0)
+df.long$pred.RSF.acc <- ifelse(df.long$selection == df.long$pred.RSF, 1, 0)
 
 # save trial level dataframe
 saveRDS(df.long, "data/SimulationData/useData/S1_dataTrialLevel.rds")
@@ -601,12 +586,14 @@ saveRDS(df.long, "data/SimulationData/useData/S1_dataTrialLevel.rds")
 
 # aggregate important variables to game level
 
-df.game <- df.long %>% group_by(id, game, condition, goal.condition, variance.condition) %>%
+df.game <- df.long %>%
+  filter(game > 1) %>%
+  group_by(id, game, condition, goal.condition, variance.condition) %>%
   summarise(
     switch.rate = mean(switched, na.rm = TRUE),
     points.cum = max(points.cum),
     resp.time.median = median(resp.time, na.rm = TRUE),
-    goalReached = max(as.numeric(as.character(goalReached))),
+    goalReachedRate = max(as.numeric(as.character(goalReached))),
     nGoalsReached = max(as.numeric(as.character(nGoalsReached))),
     checkFails = max(as.numeric(as.character(checkFails))),
     whichHighEV = max(as.numeric(as.character(whichHighEV))),
@@ -620,7 +607,9 @@ df.game <- df.long %>% group_by(id, game, condition, goal.condition, variance.co
     subj.mean.1.end = subj.mean.1[length(subj.mean.1)],
     subj.mean.2.end = subj.mean.2[length(subj.mean.2)],
     choose.highvar.rate = mean(choose.highvar, na.rm = TRUE),
-    choose.highvar.subj.rate = mean(choose.highvar.subj, na.rm = TRUE)
+    choose.highvar.subj.rate = mean(choose.highvar.subj, na.rm = TRUE),
+    pred.EV.acc.rate = mean(pred.EV.acc, na.rm = TRUE),
+    pred.RSF.acc.rate = mean(pred.RSF.acc, na.rm = TRUE)
   )
 
 risky.ag <- NULL
@@ -628,7 +617,7 @@ risky.ug <- NULL
 
 for (nn in unique(df.long$id)){
   
-  for (gg in 1:max(df.long$game)){
+  for (gg in 2:max(df.long$game)){
   
     risky.ag <- c(risky.ag,
                   mean(df.long$selection[df.long$id == nn & df.long$game == gg & df.long$points.cum >= ifelse(gg == 1, 25, 100)]
@@ -649,12 +638,14 @@ saveRDS(df.game, "data/SimulationData/useData/S1_dataGameLevel.rds")
 
 # aggregate important variables to game level
 
-df.participant <- df.long %>% group_by(id, condition, goal.condition, variance.condition) %>%
+df.participant <- df.long %>%
+  filter(game > 1) %>%
+  group_by(id, condition, goal.condition, variance.condition) %>%
   summarise(
     switch.rate = mean(switched, na.rm = TRUE),
     points.cum = sum(outcome),
     resp.time.median = median(resp.time, na.rm = TRUE),
-    goalReached = mean(goalReached),
+    goalReachedRate = mean(goalReached),
     nGoalsReached = max(as.numeric(as.character(nGoalsReached))),
     checkFails = max(as.numeric(as.character(checkFails))),
     whichHighEV = max(as.numeric(as.character(whichHighEV))),
@@ -668,7 +659,9 @@ df.participant <- df.long %>% group_by(id, condition, goal.condition, variance.c
     subj.mean.1.end = subj.mean.1[length(subj.mean.1)],
     subj.mean.2.end = subj.mean.2[length(subj.mean.2)],
     choose.highvar.rate = mean(choose.highvar, na.rm = TRUE),
-    choose.highvar.subj.rate = mean(choose.highvar.subj, na.rm = TRUE)
+    choose.highvar.subj.rate = mean(choose.highvar.subj, na.rm = TRUE),
+    pred.EV.acc.rate = mean(pred.EV.acc, na.rm = TRUE),
+    pred.RSF.acc.rate = mean(pred.RSF.acc, na.rm = TRUE)
   )
 
 risky.ag <- NULL

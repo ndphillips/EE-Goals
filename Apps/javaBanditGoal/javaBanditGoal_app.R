@@ -367,7 +367,7 @@ server <- function(input, output, session) {
               tags$ul(
                 tags$li("You will play 10 games in total. Your final bonus will be the sum of the bonuses you earn across all games. For example, if you end 3 games with at least 100 points, then you will earn a final bonus of 3 x 20 cents = 60 cents."),
                 tags$li("The boxes are the same in each game. However, the", strong("locations of the boxes will be randomly determined"), "at the start of each game. The boxes might be in the same location, or different locations, in each game."),
-                tags$li("The point values in the boxes", strong("do not change over time."), " Each time you choose and option, the point value you see is always returned to the box."),
+                tags$li("The point values in the boxes", strong("do not change over time."), " Each time you choose an option, the point value you see is always returned to the box."),
                 tags$li(strong("Remember, for each game that you earn at least 100 points you earn a bonus of 20 cents!"))
               ),
               p(strong("On the next page the first real game will start. Click to continue when you are ready.")),

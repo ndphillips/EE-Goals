@@ -44,7 +44,7 @@ for (kk in 1:n.dfs){
   # a control if a participant exhibited a crash or pressed the refresh button
   
   
-  times <- sample(c(1, 2), size = 2, replace = T, prob = c(.9, .1))
+  times <- sample(c(1, 2), size = 2, replace = T, prob = c(.95, .05))
   
   for (ti in 1:times[1]){
     
@@ -84,14 +84,14 @@ for (kk in 1:n.dfs){
     goal <- 0
     
     # determine strategy this participant uses
-    strategy.i <- sample(c("ev", "rsf", "random"), size = 1, prob = c(.65, .2, .15))
+    strategy.i <- sample(c("ev", "rsf", "random"), size = 1, prob = c(1, 0, 0))
   } else {
     
     # goal conditions
     goal <- 100
     
     # determine strategy this participant uses
-    strategy.i <- sample(c("ev", "rsf", "random"), size = 1, prob = c(.2, .65, .15))
+    strategy.i <- sample(c("ev", "rsf", "random"), size = 1, prob = c(0, 1, 0))
   }
   
   ## determine environments
