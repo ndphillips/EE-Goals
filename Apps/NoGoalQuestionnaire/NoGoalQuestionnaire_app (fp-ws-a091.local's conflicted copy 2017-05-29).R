@@ -34,9 +34,9 @@ server <- function(input, output, session) {
 # --------------------------
 
 EPtoken <- readRDS("EP_droptoken.rds")          # Reads in authentication for EP dropbox
-outputDir <- "msteiner/GoalBandit/data"          # Determine dropbox output folder
-idDir <- "msteiner/GoalBandit/ids"
-expContrDir <- "msteiner/GoalBandit/expControll"
+outputDir <- "msteiner/GoalBanditJava/data"          # Determine dropbox output folder
+idDir <- "msteiner/GoalBanditJava/ids"
+expContrDir <- "msteiner/GoalBanditJava/expControll"
 
 
 # --------------------------
@@ -128,8 +128,8 @@ if (CurrentValues$page == 17) {
       p(strong("Which of the following two strategies best describes how you made selections in the game?")),
       radioButtons("whichStrategy",
                    label = NULL,
-                   choices = list("DO NOT commit to any single box. Try to figure out which box gives the best points at the current time and ignore how good or bad each box has been in the past. If a box has several bad point values in a row, it's best to switch to another." = 1,
-                                  "Do commit to a single box. Try to figure out which box gives the best points on average and then stick with it, even if it gives several bad outcomes in a row." = 2),
+                   choices = list("I always tried to select the box that gives the most points on average." = 1,
+                                  "I first looked at how many clicks I had left and how many points I had. Then, I selected one box or the other." = 2),
                    selected = character(0),
                    width = "600px"),
       p(strong("Have you played a similar task as this one on the MTurk?")),
@@ -191,15 +191,18 @@ if (CurrentValues$page == 18) {
     
 # 19) Post Game Survey B
 
+  
+  
 if (CurrentValues$page == 19) {
   return(
     div(class = "page19", checked = NA,
     list(
-      p("Please answer the following questions truthfully to help us with our research.", br(), em("Your answer will NOT affect your reward or bonus!!"), br(), class = "firstRow", id = "affectReward"),
+      tags$br(), tags$br(), tags$br(),
       radioButtons("gaveUp",
                    label = "Did you give up and stop caring about earning points at any time during the games?",
-                   choices = list("No. I never gave up trying to earn as many points as possible" = 2,
-                                  "Yes. During one or more games I gave up trying to earn points" = 1),
+                   choices = list("Never. I never gave up trying to earn as many points as possible" = 1,
+                                  "Sometimes. During one or more games I gave up trying to earn points" = 2,
+                                  "Often. During many games I gave up trying to earn points" = 3),
                    selected = character(0),
                    width = "500px"),
       radioButtons("tookNotes",
@@ -437,6 +440,7 @@ output$MainAction <- renderUI( {
                              "strategy" = strategy.i,
                              "strategy.change" = strategyChange.i,
                              "which.strategy" = whichStrategy.i,
+                             "attention.clicks" = NA,
                              "instructions.clear" = instructionsClear.i,
                              "similar.task" = similarTask.i,
                              "not.understood" = notUnderstood.i,

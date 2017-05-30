@@ -70,6 +70,7 @@ table(df.participant$goal.condition, df.participant$variance.condition)
 
 m.rug <- glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
            data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
+
 summary(m.rug)
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
@@ -124,11 +125,23 @@ summary(m.chv)
 # get the odds ration of choosing the high variance option when it is rational to do so
 exp(m.chv@beta[2])
 
+## With a logistic mixed effects model, check whether, in the NoGoal condition, the high variance option is chosen
+#  more often when it is rational to do so according to RSF, but to a much less extent than Goal condition.
+# Note: We don't have a good psychological explanation for this. It's just a 'strange' correlation between
+#   rsf optional options and high ev option...
+# PREDICTION: In the NoGoal condition, the high variance option is chosen with a higher probability when it is rational
+#             to do so according to RSF, but only to a small extent if at all.
+
+m.chv.ng <- glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
+               data = subset(df.trial, goal.condition == "NoGoal" & game > 1), family = binomial)
+
+summary(m.chv.ng)
+
 # plot this result on participant level
 
 # first aggregate to participant level with choose.highvar as dichotomous variable
 df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + id + goal.condition + variance.condition, FUN = mean,
-                  data = subset(df.tria, game > 1))
+                  data = subset(df.trial, game > 1))
 
 # plot the proportion of high variance chosen separated for the variance, the goal conditions and for whether it
 # was, according to rsf, rational to choose the high variance option
@@ -219,8 +232,8 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(goalReachedRate ~ goal.condition, data = df.participant,
-           ylab = "prop high var chosen", xlab = "Conditions", main = "Goal Reached Rate")
+pirateplot(goalReachedRate ~ goal.condition + variance.condition, data = df.participant,
+           ylab = "Reach goal", xlab = "Conditions", main = "Goal Reached Rate")
 # -----------------------
 
 ## Check the absolute number of points earned.
@@ -236,7 +249,7 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(points.cum ~ variance.condition + goal.condition, data = df.participant,
+pirateplot(points.cum ~ goal.condition + variance.condition, data = df.participant,
            ylab = "Total Number of Points", xlab = "Conditions", main = "Total Points Reached")
 
 # -----------------------
