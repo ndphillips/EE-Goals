@@ -31,9 +31,9 @@ gc()
 
 if (!require(yarrr)) install.packages("yarrr"); library(yarrr)
 if (!require(BayesFactor)) install.packages("BayesFactor"); library(BayesFactor)
-if (!require(lsr)) install.packages("lsr"); library(lsr)
+if (!require(afex)) install.packages("afex"); library(afex)
 if (!require(coin)) install.packages("coin"); library(coin)
-if (!require(lme4)) install.packages("lme4"); library(lme4)
+if (!require(blme)) install.packages("blme"); library(blme)
 if (!require(dplyr)) install.packages("dplyr"); library(dplyr)
 
 # Set working directory
@@ -68,16 +68,17 @@ table(df.participant$goal.condition, df.participant$variance.condition)
 # PREDICTION: The probability of selecting the high-variance option given that one is below 100 points (the goal)
 #             is HIGHER in the goal than in the no goal condition.
 
-m.rug <- glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
-           data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
-summary(m.rug)
+m.rug.b <- blme::bglmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
+               data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
+
+summary(m.rug.b)
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
-exp(m.rug@beta[2])
+exp(m.rug.b@beta[2])
 # get the odds ration of choosing the high variance option when the variance condition is Low compared to Equal
-exp(m.rug@beta[3])
+exp(m.rug.b@beta[3])
 # get the odds ration of choosing the high variance option when the goal condition is NoGoal compared to Goal
-exp(m.rug@beta[4])
+exp(m.rug.b@beta[4])
 
 if (Sys.info()[1] == "Windows"){
   windows(height = 22, width = 33)
@@ -85,7 +86,7 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(risky.ug ~ goal.condition + variance.condition, data = df.participant,
+yarrr::pirateplot(risky.ug ~ goal.condition + variance.condition, data = df.participant,
            ylab = "prop high var chosen", xlab = "Conditions", main = "Risky Under Goal")
 # -----------------------
 
@@ -93,16 +94,17 @@ pirateplot(risky.ug ~ goal.condition + variance.condition, data = df.participant
 # PREDICTION: The probability of selecting the high-variance option given that one is above 100 points (the goal)
 #             is LOWER in the goal than in the no goal condition.
 
-m.rag <- glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
-           data = subset(df.trial, overGoal == 1 & game > 1), family = binomial)
-summary(m.rag)
+
+m.rag.b <- blme::bglmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
+               data = subset(df.trial, overGoal == 1 & game > 1), family = binomial)
+summary(m.rag.b)
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
-exp(m.rag@beta[2])
+exp(m.rag.b@beta[2])
 # get the odds ration of choosing the high variance option when the variance condition is Low compared to Equal
-exp(m.rag@beta[3])
+exp(m.rag.b@beta[3])
 # get the odds ration of choosing the high variance option when the goal condition is NoGoal compared to Goal
-exp(m.rag@beta[4])
+exp(m.rag.b@beta[4])
 
 if (Sys.info()[1] == "Windows"){
   windows(height = 22, width = 33)
@@ -110,7 +112,7 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(risky.ag ~ goal.condition + variance.condition, data = df.participant,
+yarrr::pirateplot(risky.ag ~ goal.condition + variance.condition, data = df.participant,
            ylab = "prop high var chosen", xlab = "Conditions", main = "Risky Above Goal")
 # -----------------------
 
@@ -118,17 +120,31 @@ pirateplot(risky.ag ~ goal.condition + variance.condition, data = df.participant
 #  more often when it is rational to do so according to RSF.
 # PREDICTION: In the goal condition, the high variance option is chosen with a higher probability when it is rational
 #             to do so according to RSF.
-m.chv <- glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
+
+m.chv.b <- blme::bglmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
                data = subset(df.trial, goal.condition == "Goal" & game > 1), family = binomial)
-summary(m.chv)
+summary(m.chv.b)
+
 # get the odds ration of choosing the high variance option when it is rational to do so
-exp(m.chv@beta[2])
+exp(m.chv.b@beta[2])
+
+## With a logistic mixed effects model, check whether, in the NoGoal condition, the high variance option is chosen
+#  more often when it is rational to do so according to RSF, but to a much less extent than Goal condition.
+# Note: We don't have a good psychological explanation for this. It's just a 'strange' correlation between
+#   rsf optional options and high ev option that we find in the simulated data, so we want to check it...
+# PREDICTION: In the NoGoal condition, the high variance option is chosen with a higher probability when it is rational
+#             to do so according to RSF, but only to a small extent if at all.
+
+m.chv.ng.b <- blme::bglmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
+                  data = subset(df.trial, goal.condition == "NoGoal" & game > 1), family = binomial)
+
+summary(m.chv.ng.b)
 
 # plot this result on participant level
 
 # first aggregate to participant level with choose.highvar as dichotomous variable
 df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + id + goal.condition + variance.condition, FUN = mean,
-                  data = subset(df.tria, game > 1))
+                  data = subset(df.trial, game > 1))
 
 # plot the proportion of high variance chosen separated for the variance, the goal conditions and for whether it
 # was, according to rsf, rational to choose the high variance option
@@ -144,7 +160,7 @@ if (Sys.info()[1] == "Windows"){
 #               difference in the proportion of high variance option chosen when it is rational to do so vs when it is
 #               not.
 par(mar=c(5,7,3,3))
-pirateplot(high.var.chosen ~ choose.highvar.subj + variance.condition + goal.condition, data = df.n,
+yarrr::pirateplot(high.var.chosen ~ choose.highvar.subj + variance.condition + goal.condition, data = df.n,
            ylab = "prop high var chosen", xlab = "choose high var subj (rsf)", main = "")
 # -----------------------
 
@@ -156,13 +172,15 @@ pirateplot(high.var.chosen ~ choose.highvar.subj + variance.condition + goal.con
 # hwo often do the models make different predictions
 with(subset(df.trial, game > 1), mean(pred.EV != pred.RSF, na.rm = TRUE))
 
-m.pa <- glmer(pred.RSF.acc ~ goal.condition + (1|game) + (1|id),
-               data = subset(df.trial, game > 1 & pred.EV != pred.RSF), family = binomial)
-summary(m.pa)
+m.pa.b <- blme::bglmer(pred.RSF.acc ~ goal.condition + (1|game) + (1|id),
+              data = subset(df.trial, game > 1 & pred.EV != pred.RSF), family = binomial)
+
+summary(m.pa.b)
 
 # get the odds ration of RSF prediction accuracy when the condition is goal compared to no goal
-exp(m.pa@beta[2])
+exp(m.pa.b@beta[2])
 
+# aggregate using the dplyr package
 df.p <- df.trial %>%
   filter(game > 1 & pred.EV != pred.RSF) %>%
   group_by(id, variance.condition, goal.condition) %>%
@@ -177,7 +195,7 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(pred.RSF.acc.rate ~ goal.condition + variance.condition, data = df.p,
+yarrr::pirateplot(pred.RSF.acc.rate ~ goal.condition + variance.condition, data = df.p,
            ylab = "RSF corr pred rate", xlab = "Condition", main = "Only Trials where RSF and EV differ")
 # -----------------------
 
@@ -189,7 +207,7 @@ pirateplot(pred.RSF.acc.rate ~ goal.condition + variance.condition, data = df.p,
 ## Check the proportion of high variance options chosen overall.
 # PREDICTION: The proportion of high variance options chosen overall is higher in the goal compared to the no goal
 #             conditions.
-w.hvo <- wilcox_test(high.var.chosen.rate ~ as.factor(goal.condition), data = df.participant); w.hvo
+w.hvo <- coin::wilcox_test(high.var.chosen.rate ~ as.factor(goal.condition), data = df.participant); w.hvo
 
 # effect size r
 eff.r.hvo <- as.numeric(w.hvo@statistic@teststatistic / sqrt(nrow(df.participant))); eff.r.hvo
@@ -201,13 +219,13 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(high.var.chosen.rate ~ goal.condition, data = df.participant,
+yarrr::pirateplot(high.var.chosen.rate ~ goal.condition, data = df.participant,
            ylab = "prop high var chosen", xlab = "Conditions", main = "Risky Rate Overall")
 # -----------------------
 
 ## Check the probability of reaching 100 points.
 # PREDICTION: The probability of reaching 100 points is higher in the goal vs. the no goal condition.
-w.rg <- wilcox_test(goalReachedRate ~ as.factor(goal.condition), data = df.participant); w.rg
+w.rg <- coin::wilcox_test(goalReachedRate ~ as.factor(goal.condition), data = df.participant); w.rg
 
 # effect size r
 eff.r.rg <- as.numeric(w.rg@statistic@teststatistic / sqrt(nrow(df.participant))); eff.r.rg
@@ -219,15 +237,55 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(goalReachedRate ~ goal.condition, data = df.participant,
-           ylab = "prop high var chosen", xlab = "Conditions", main = "Goal Reached Rate")
+yarrr::pirateplot(goalReachedRate ~ goal.condition + variance.condition, data = df.participant,
+           ylab = "Reach goal", xlab = "Conditions", main = "Goal Reached Rate")
 # -----------------------
 
 ## Check the absolute number of points earned.
 # PREDICTION: Number of points earned are, on average, highest in the the "Equal" environment.
-r.pc <- lm(points.cum ~ variance.condition + goal.condition + variance.condition * goal.condition, data = df.participant)
-summary(r.pc)
-anova(r.pc)
+
+df.participant$goal.condition <- as.factor(df.participant$goal.condition)
+df.participant$variance.condition <- as.factor(df.participant$variance.condition)
+
+TAB <- afex::aov_ez(id = "id", dv = "points.cum", data = df.participant,
+                    between = c("goal.condition", "variance.condition"), factorize = FALSE, return = "Anova")
+
+# Partial eta squared and power
+eff <- length(TAB[, 1]) - 2
+Power <- vector(length = eff)
+eta.sq <- vector(length = eff)
+df2 <- TAB["Residuals", 2]
+
+for (i in 1:eff){
+  df1 <- TAB[i + 1, 2]
+  eta.sq[i] <- TAB[i + 1, 1] / (TAB[i + 1, 1] + TAB["Residuals", 1])
+  ncp <- TAB[i + 1, 3] * df1
+  Fk <- qf(1-0.05, df1, df2)
+  Power[i] <- 1 - pf(Fk, df1 = df1, df2 = df2, ncp = ncp)
+}
+
+# Table with eta squared and power
+eta.sq.Power <- data.frame(eta.sq, Power)
+rownames(eta.sq.Power) <- rownames(TAB)[-c(1, nrow(TAB))]
+
+# Compute Least–Square-Means / Rand-Means
+TAB2 <- lm(points.cum ~ variance.condition * goal.condition, data = df.participant)
+ls.means <- lsmeans(TAB2, ~ variance.condition * goal.condition)
+
+# print outputs
+list(ANOVA=TAB, eta.sq.Power=eta.sq.Power, "Estimated Means"=ls.means)
+
+# check hypothesized contrast that Equal has the highest value
+C <- list(c(2, -1, -1))
+M <- lsmeans(TAB2, ~variance.condition)
+contrast(M, C)
+
+# bayesian form of anova
+a.pc.b <- anovaBF(points.cum ~ variance.condition + goal.condition, data = df.participant)
+summary(a.pc.b)
+plot(a.pc.b)
+
+
 
 # plot the result
 if (Sys.info()[1] == "Windows"){
@@ -236,7 +294,7 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-pirateplot(points.cum ~ variance.condition + goal.condition, data = df.participant,
+yarrr::pirateplot(points.cum ~ goal.condition + variance.condition, data = df.participant,
            ylab = "Total Number of Points", xlab = "Conditions", main = "Total Points Reached")
 
 # -----------------------
@@ -279,7 +337,7 @@ round(prop.table(table(df.participant$goal.condition, df.participant$whichHighEV
 
 # did participants in the goal condition find it harder to earn points
 # PREDICTION: Yes participants in the goal condition, on average, find it harder to earn points
-w.test <- wilcox_test(game.difficulty ~ as.factor(goal.condition), data = df.participant); w.test
+w.test <- coin::wilcox_test(game.difficulty ~ as.factor(goal.condition), data = df.participant); w.test
 eff.r <- a.numeric(w.test@statistic@teststatistic / sqrt(nrow(df.participant))); eff.r
 
 
