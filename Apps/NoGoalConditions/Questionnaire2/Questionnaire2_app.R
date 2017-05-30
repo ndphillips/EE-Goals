@@ -44,13 +44,7 @@ expContrDir <- "msteiner/GoalBanditJava/expControll"
 # --------------------------
 
 
-condition <- 1 #partNumber[1, 1] %% 4 + 1
-
-# condition 1: high EV is low variance, no goal
-# condition 2: high EV is high variance, no goal
-# condition 3: high EV is low variance, medium goal
-# condition 4: high EV is high variance, medium goal
-
+condition <- 2
 
 
 # --------------------------

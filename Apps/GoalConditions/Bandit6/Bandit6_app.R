@@ -98,7 +98,7 @@ EPtoken <- readRDS("EP_droptoken.rds")          # Reads in authentication for EP
 outputDir <- "msteiner/GoalBanditJava/data"          # Determine dropbox output folder
 idDir <- "msteiner/GoalBanditJava/ids"
 expContrDir <- "msteiner/GoalBanditJava/expControll"
-link.i <- "https://econpsychbasel.shinyapps.io/Questionnaire1/"
+link.i <- "https://econpsychbasel.shinyapps.io/Questionnaire6/"
 
 linkPage =paste0("location.href='",link.i , "';")
 

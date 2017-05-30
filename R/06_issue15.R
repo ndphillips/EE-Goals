@@ -83,6 +83,7 @@ df.n <- aggregate(high.var.chosen ~ choose.highvar + workerid + game, FUN = mean
                   data = subset(df, condition == 3))
 
 # compute a mixed effects model with game and workerid as random effects
+
 #summary(lmer(high.var.chosen ~ 1 + choose.highvar + (1|game) + (1|workerid), data = df.n))
 summary(glmer(high.var.chosen ~ choose.highvar + (1|game) + (1|workerid), data = subset(df, condition == 3), family = binomial))
 
@@ -99,8 +100,11 @@ df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + workerid + game, FUN =
                   data = subset(df, condition == 3))
 
 # compute a mixed effects model with game and workerid as random effects
+
 #summary(lmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|workerid), data = df.n))
 summary(glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|workerid), data = subset(df, condition == 3), family = binomial))
+
+summary(lmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|workerid), data = df.n))
 
 # plot it
 windows(height = 22, width = 33)
