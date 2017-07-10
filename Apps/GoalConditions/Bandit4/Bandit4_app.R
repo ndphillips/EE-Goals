@@ -102,7 +102,7 @@ link.i <- "https://econpsychbasel.shinyapps.io/Questionnaire4/"
 
 linkPage =paste0("location.href='",link.i , "';")
 
-
+ids.df <- read.csv("www/workerIdDatabase.csv")
 
 # --------------------------------
 # Section B: The user Interface and its JavaScript logic to run the game----
@@ -133,7 +133,8 @@ server <- function(input, output, session) {
                                   trials.max = nTrials,
                                   nGoalsReached = 0,
                                   checkFails = 0,
-                                  payout = 0)
+                                  payout = 0,
+                                  checkOK = 0)
   
   # GameValues stores vectors of histories
   GameData <- reactiveValues(trial = c(),          
@@ -178,6 +179,19 @@ server <- function(input, output, session) {
         )
       )}
     
+    # Not Allowed Page
+    if (CurrentValues$page == "notAllowed") {
+      return(
+        div(class = "page2", checked = NA,
+            list(
+              tags$br(), tags$br(), tags$br(),
+              h2(paste0("You entered the WorkerID ", input$workerid,"."), class = "firstRow"),
+              p("Sorry but you are not eligible for this HIT because you completed a similar HIT in the past.", id = "notEligible"),
+              p("You may now close this window.")
+            )
+        )
+      )
+    }
     # INSTRUCTIONS INTRO
     
     if (CurrentValues$page == "inst1") {
@@ -212,14 +226,14 @@ server <- function(input, output, session) {
               tags$p("At the top of the screen you will always see three important pieces of information: The number of clicks you have remaining in the game, the total number of points you have earned so far in the game and the goal."),
               h3("Here is a screenshot of how the game will look:"),
               tags$br(),
-              fixedRow(column(12, align ="center", tags$img(src = "instGoal.png"))),
+              fixedRow(column(12, align ="center", tags$img(src = "instGoal.PNG"))),
               # fixedRow(column = 12, plotOutput("InstructionDisplay")),
               # fixedRow(column = 12, plotOutput("resultsDisplayInstructions")),
               p(paste("To use one of your", nTrials, "clicks, you can click on one of the boxes. When you click on a box, the computer will randomly select one of the box's point values. This point value will be displayed in the box. The drawn point value will then be added to your point total (or subtracted from it if the value is negative). The number of clicks you have remaining will then decrease by 1. When you have 0 clicks remaining, the game will end.")),
               h3("Reach 100 points to earn a bonus!"),
-              p("If you end a game with 100 points or more, you will earn a 20 cents bonus for that game. If you end a game with fewer than 100 points, you will not receive a 20 cent bonus for that game. The specific point value you reach does not matter for your bonus, it only matters if you end with at least 100 points or not."),
+              p("If you end a game with 100 points or more, you will earn a 25 cents bonus for that game. If you end a game with fewer than 100 points, you will not receive a 25 cent bonus for that game. The specific point value you reach does not matter for your bonus, it only matters if you end with at least 100 points or not."),
               h3("Points are returned to the boxes"),
-              p("The computer will always draw a random point value from the box and will always return that point value back to the box. In other words, the distribution of point values in each box",  strong("will not change over time as a result of your clicks.")),
+              p("The computer will always draw a random point value from the box and will always return that point value back to the box. In other words, the distribution of point values in each box",  strong("will not change over time as a result of your clicks. The distributions will also not change over games although the position of the boxes will randomly vary.")),
               tags$br(),
               actionButton(inputId = "gt_goalInst", label = "Continue", class = "continueButtons"),
               tags$br(),tags$br(),tags$br()
@@ -236,14 +250,16 @@ server <- function(input, output, session) {
             list(
               tags$br(), tags$br(),
               h2("End a game with 100 points to earn a bonus", class = "firstRow"),
-              p("If, at the end of a game, you have earned at least 100 points, you", strong(paste("will earn an extra bonus of 20 cents for that game.")), "If you do not end the game with 100 points or more, you will not earn a bonus for that game."),
+              p("If, at the end of a game, you have earned at least 100 points, you", strong(paste("will earn an extra bonus of 25 cents for that game.")), "If you do not end the game with 100 points or more, you will not earn a bonus for that game."),
               p("For example:"),
-              p("If you", strong("end a game with 90 points"), " (less than the goal of 100) you won't receive 20 cents for that game"),
-              p("If you", strong("end a game with 110 points"), "(more than the goal of 100), then you", em("will"), "receive 20 cents for that game."),
-              p("The specific number of points you earn doesn't matter, it only matters if you end the game above below 100 points. That is, it doesn't matter if you end a game with 100 points or 150 points, in both cases you will still earn a fixed bonus of 20 cents for that game."),
+              p("If you", strong("end a game with 90 points"), " (less than the goal of 100) you won't receive 25 cents for that game"),
+              p("If you", strong("end a game with 110 points"), "(more than the goal of 100), then you", em("will"), "receive 25 cents for that game."),
+              p("The specific number of points you earn doesn't matter, it only matters if you end the game above below 100 points. That is, it doesn't matter if you end a game with 100 points or 150 points, in both cases you will still earn a fixed bonus of 25 cents for that game."),
               p("You will only receive the bonus if you", strong("end"), "the game with at least 100 points. This means that, even if you are above 100 points in the middle of the game, if you end the game with fewer than 100 points, then you won't earn the bonus."),
               h3("Your final bonus is added across all games"),
-              p("Again, you will play the Boxes Game 10 times. Your final bonus for this HIT will be the sum of your bonuses across all games. For example if you earn a 20 cent bonus in 3 games out of 10, you will receive a bonus of 3 x 20 cents, i.e. 60 cents."),
+              p("Again, you will play the Boxes Game 10 times. Your final bonus for this HIT will be the sum of your bonuses across all games. For example if you earn a 25 cent bonus in 3 games out of 10, you will receive a bonus of 3 x 25 cents, i.e. 75 cents."),
+              h3("It is difficult to reach 100 points."),
+              p("It is not easy to reach 100 points in the Boxes Game. You can increase your chance of reaching 100 points based on how you play the game. However, the game is difficult and there will always be a chance you will not be able to reach 100 points. So if you fail to reach 100 points in a game, don't get discouraged and try again in the next game."),
               tags$br(),
               actionButton(inputId = "gt_instCheck", label = "Continue", class = "continueButtons")
             )
@@ -262,8 +278,8 @@ server <- function(input, output, session) {
               tags$br(),
               radioButtons("checkGoal",
                            label = "What happens if I end a game with l00 points or more?",
-                           choices = list("I will earn a bonus of exactly 20 cents for that game." = 1,
-                                          "I will earn a bonus of the number of total points I earn, plus a bonus of 20 cents." = 2),
+                           choices = list("I will earn a bonus of exactly 25 cents for that game." = 1,
+                                          "I will earn a bonus of the number of total points I earn, plus a bonus of 25 cents." = 2),
                            selected = character(0),
                            width = "800px"),
               radioButtons("checkChange",
@@ -273,12 +289,27 @@ server <- function(input, output, session) {
                            selected = character(0),
                            width = "800px"),
               tags$br(),
-              disabled(actionButton(inputId = "gt_inst3", label = "Continue", class = "continueButtons")),
+              actionButton(inputId = "gt_inst3", label = "Continue", class = "continueButtons"),
               tags$br(),tags$br(),tags$br()
             )
         )
       )}
     
+    
+    # SCREEN FAILED CHECK
+    if (CurrentValues$page == "failedCheck") {
+      
+      return(
+        div(class = "inst", checked = NA,
+            list(
+              tags$br(), tags$br(),
+              h3("Sorry, wrong answer. Please read the instructions again."),
+              p("Sorry, you did not answer one of the comprehension questions correctly. Click continue to read the instructions again."),
+              tags$br(),
+              actionButton(inputId = "gt_inst2", label = "Continue", class = "continueButtons")
+            )
+        )
+      )}
     
     # 4) PRACTICE GAME INSTRUCTIONS
     
@@ -319,15 +350,16 @@ server <- function(input, output, session) {
               tags$script('newGame();'),
               column(12,
                      fixedRow(tags$br()),
+                     fixedRow(column(12, align = "left", h2(ifelse(CurrentValues$game == 1, "Practice Game", paste("Game ", CurrentValues$game - 1, "of 10"))))),
                      fixedRow(
                        column(6, align="right", p(id = "clicksRemaining",
                                                    paste(ifelse(CurrentValues$page == "game", nTrials, nTrialsPractice)))),
-                       column(6, align="left", h3(class = "upperParams", " Clicks Remaining"))
+                       column(6, align="left", h3(id = "clicksText", class = "upperParams", " Clicks Remaining"))
                      ),
                      fixedRow(
                        column(5, align="right", p(id = "pointCounter", "0")), # This is updated via JavaScript
                        column(1, align="left", p(id = "goalvalue", paste0("/", ifelse(CurrentValues$page == "game", goal, goal.practice)))),
-                       column(6, align="left", h3(id = "pEarned", class = "upperParams", "Points Earned"))
+                       column(6, align="left", h3(id = "pEarned", class = "upperParams", " Points Earned"))
                      ),
                      fixedRow(tags$br()),
                      fixedRow(
@@ -365,10 +397,10 @@ server <- function(input, output, session) {
               p("You are now finished with the practice game. On the next pages, you'll start playing the first of 10 real games that will count towards your bonus!"),
               p("Here are a few additional notes and reminders about the game:"),
               tags$ul(
-                tags$li("You will play 10 games in total. Your final bonus will be the sum of the bonuses you earn across all games. For example, if you end 3 games with at least 100 points, then you will earn a final bonus of 3 x 20 cents = 60 cents."),
+                tags$li("You will play 10 games in total. Your final bonus will be the sum of the bonuses you earn across all games. For example, if you end 3 games with at least 100 points, then you will earn a final bonus of 3 x 25 cents = 75 cents."),
                 tags$li("The boxes are the same in each game. However, the", strong("locations of the boxes will be randomly determined"), "at the start of each game. The boxes might be in the same location, or different locations, in each game."),
                 tags$li("The point values in the boxes", strong("do not change over time."), " Each time you choose an option, the point value you see is always returned to the box."),
-                tags$li(strong("Remember, for each game that you earn at least 100 points you earn a bonus of 20 cents!"))
+                tags$li(strong("Remember, for each game that you earn at least 100 points you earn a bonus of 25 cents!"))
               ),
               p(strong("On the next page the first real game will start. Click to continue when you are ready.")),
               tags$br(),
@@ -387,8 +419,9 @@ server <- function(input, output, session) {
               tags$br(), tags$br(),
               p(paste("You ended Game", CurrentValues$game - 2, "with", GameData$points.cum[length(GameData$points.cum)], "points.")),
               
-              if (GameData$points.cum[length(GameData$points.cum)] >= goal){h3(paste("You did reach 100 points and earned a bonus of 20 cents for this game!"))},
+              if (GameData$points.cum[length(GameData$points.cum)] >= goal){h3(paste("You did reach 100 points and earned a bonus of 25 cents for this game!"))},
               if (GameData$points.cum[length(GameData$points.cum)] < goal){h3(paste("You did not reach 100 points and did not earn a bonus for this game."))},
+              if (GameData$points.cum[length(GameData$points.cum)] < goal){p("Remember that while you can increase your chances of reaching 100 points based on how you play the game, there is always a chance you won’t reach 100 points. Don’t get discouraged and try again in the next game.")},
               
               p("Click the button below to start the next game."),
               p("Remember that all games have the same boxes, however, the positions of the boxes will be randomly determined when the game starts."),
@@ -404,7 +437,7 @@ server <- function(input, output, session) {
             list(
               tags$br(), tags$br(),
               h3("You finished all games!", class = "firstRow"),
-              p(strong(paste0("You have now finished playing all 10 games. You reached 100 points ", CurrentValues$nGoalsReached, " times."), br(), paste0("Thus you receive a bonus of ", CurrentValues$nGoalsReached, " x 20 cents, that is $", CurrentValues$payout, "."))),
+              p(strong(paste0("You have now finished playing all 10 games. You reached 100 points ", CurrentValues$nGoalsReached, " times."), br(), paste0("Thus you receive a bonus of ", CurrentValues$nGoalsReached, " x 25 cents, that is $", CurrentValues$payout, "."))),
               tags$br(),
               h3("Please answer the following question about the two options."),
               radioButtons("which.high.ev",
@@ -443,7 +476,15 @@ server <- function(input, output, session) {
   # --------------------------------
   
   # Section F1: Page Navigation Buttons
-  observeEvent(input$gt_inst1, {CurrentValues$page <- "inst1"})
+  observeEvent(input$gt_inst1, {
+    if (gsub("[[:space:]]", "", tolower(as.character(input$workerid))) %in% tolower(ids.df[, 1])){
+      CurrentValues$checkOk <- 1
+      CurrentValues$page <- "notAllowed"
+    } else {
+      CurrentValues$checkOk <- 2
+      CurrentValues$page <- "inst1"
+    }
+  })
   observeEvent(input$gt_inst2, {CurrentValues$page <- "inst2"})
   observeEvent(input$gt_goalInst, {CurrentValues$page <- "goalInst"})
   observeEvent(input$gt_instCheck, {CurrentValues$page <- "instCheck"})
@@ -452,8 +493,9 @@ server <- function(input, output, session) {
       if (input$checkChange == 2 & input$checkGoal == 1) {
         CurrentValues$page <- "inst3"
       } else {
-        CurrentValues$page <- "inst2"
+        CurrentValues$page <- "failedCheck"
         CurrentValues$checkFails <- CurrentValues$checkFails + 1
+        # updateRadioButtons(session, "checkChange", selected = character(0))
       }
     }
   })
@@ -464,7 +506,7 @@ server <- function(input, output, session) {
     } else { if (CurrentValues$game %in% c(2:(n.games - 1))){
       CurrentValues$page <- "pageEndGame"
     } else {
-      CurrentValues$payout <- CurrentValues$nGoalsReached * .2
+      CurrentValues$payout <- CurrentValues$nGoalsReached * .25
       CurrentValues$page <- "lastEndGame"
     }
     }
@@ -493,9 +535,9 @@ server <- function(input, output, session) {
     }
   })
   
-  observeEvent(input$checkChange, {
-    enable("gt_inst3")
-  })
+  # observeEvent(input$checkChange, {
+  #   enable("gt_inst3")
+  # })
   
   observeEvent(input$which.high.ev, {
     enable("gt_part2Inst")
@@ -524,7 +566,7 @@ server <- function(input, output, session) {
                                             "goal" = goal,
                                             "condition" = condition,
                                             "n.goals.reached" = CurrentValues$nGoalsReached,
-                                            "check.fails" = CurrentValues$checkFails,
+                                            "checkFails" = CurrentValues$checkFails,
                                             "payout" = CurrentValues$payout,
                                             "which.high.ev" = input$which.high.ev)
                    

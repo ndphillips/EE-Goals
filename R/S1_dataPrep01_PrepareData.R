@@ -4,12 +4,11 @@ gc()
 # ------------
 # DATA CLEANING
 #
-# Study (working title): Is behavior in a bandit task with a minimum aspiration level state
-# dependent?
+# Study (working title): Need based decision making in a reinforcement learning task.
 # 
 # Authors:
-#   - Markus Steiner (markus.steiner@unibas.ch)
-#   - Nathaniel Phillips (nathaniel.phillips@unibas.ch)
+#   - Markus D. Steiner (markus.d.steiner@gmail.com)
+#   - Nathaniel D. Phillips (Nathaniel.D.Phillips.is@gmail.com)
 # 
 # This script anonymizes, separates and prepares the data. Note that the data for section A and B of
 # this script will not be provided, because it contains sensible information whith which participants 
@@ -42,8 +41,13 @@ setwd(rprojroot::is_rstudio_project$find_file())
 # Section A: Check Exclusion Criteria and Prepare Anonymization
 # --------------------------------------------------------------
 
+# read in files with ids of persons who were not allowed to participate but participated anyway
+exclude.df <- read.table("data/Study1Data/idsNotAllowed.txt", header = TRUE, as.is = TRUE)
+
+exclude1 <- tolower(exclude.df[,1])
+
 # get a list of the id files available
-fil <- list.files("data/SimulationData/ids/", full.names = T)
+fil <- list.files("data/Study1Data/ids/", full.names = TRUE)
 
 ## read in the id files and save the ids in a matrix
 
@@ -63,7 +67,10 @@ for (ii in 1:length(fil)){
 table.ids <- table(ids)
 
 # ids to exclude
-exclude1 <- tolower(names(table.ids[table.ids != 2]))
+exclude <- tolower(names(table.ids[table.ids != 2]))
+
+# only use the ones not already in exclude 1
+exclude <- exclude[-which(exclude %in% exclude1)]
 
 # vector to index ids
 unique.ids <- unique(ids)
@@ -86,15 +93,20 @@ close(fileConnRead)
 
 # add old and new lines
 fileConnWrite <- file("documents/exclution_log.txt", "wt")
-write(c(txt, "\n", paste("Number of participant excluded due to too many or too few files are:",
-                   length(exclude1)), "Their Ids are:", paste(
-                     anonym.ids[which(tolower(unique.ids) %in% exclude1)], collapse = "; ")),
+write(c(txt, "\n", paste("Number of participants excluded because they were not allowed to participate:",
+                         length(exclude1)), "Their Ids are:", paste(
+                           anonym.ids[which(tolower(unique.ids) %in% exclude1)], collapse = "; "), "\n\n",
+        paste("Number of participant excluded due to too many or too few files are:",
+                   length(exclude)), "Their Ids are:", paste(
+                     anonym.ids[which(tolower(unique.ids) %in% exclude)], collapse = "; ")),
       fileConnWrite)
 close(fileConnWrite)
 
+exclude1 <- c(exclude1, exclude)
+
 # get a list of the data files and directory they're in
-list.games <- list.files("data/SimulationData/data/", pattern = "_g.csv", full.names = T)
-list.surveys <- list.files("data/SimulationData/data/", pattern = "_s.csv", full.names = T)
+list.games <- list.files("data/Study1Data/data/", pattern = "_g.csv", full.names = T)
+list.surveys <- list.files("data/Study1Data/data/", pattern = "_s.csv", full.names = T)
 
 # prepare vector for ids to exclude because of certain behaviroal patterns
 exclude.behavior <- NULL
@@ -224,11 +236,11 @@ for (ii in 1:length(list.games)){
   # determine where to save the data (either folder with erroneous data or with useful data)
   if (tolower(as.character(temp.game$workerid[1])) %in% exclude1){
     
-    folder <- "data/SimulationData/errorData/"
+    folder <- "data/Study1Data/errorData/"
     
   } else {
     
-    folder <- "data/SimulationData/useData/"
+    folder <- "data/Study1Data/useData/"
     
   }
   
@@ -252,11 +264,11 @@ for (jj in 1:length(list.surveys)){
   # determine where to save the data (either folder with erroneous data or with useful data)
   if (tolower(as.character(temp.surveys$workerid[1])) %in% exclude1){
     
-    folder <- "data/SimulationData/errorData/"
+    folder <- "data/Study1Data/errorData/"
     
   } else {
     
-    folder <- "data/SimulationData/useData/"
+    folder <- "data/Study1Data/useData/"
     
   }
   
@@ -280,8 +292,8 @@ for (jj in 1:length(list.surveys)){
 # ------------------------
 
 # get list of data files
-list.games <- list.files("data/SimulationData/useData/", pattern = "_g_S1.txt", full.names = T)
-list.surveys <- list.files("data/SimulationData/useData/", pattern = "_s_S1.txt", full.names = T)
+list.games <- list.files("data/Study1Data/useData/", pattern = "_g_S1.txt", full.names = T)
+list.surveys <- list.files("data/Study1Data/useData/", pattern = "_s_S1.txt", full.names = T)
 
 
 ### Section C1: Game Data
@@ -580,7 +592,7 @@ df.long$pred.EV.acc <- ifelse(df.long$selection == df.long$pred.EV, 1, 0)
 df.long$pred.RSF.acc <- ifelse(df.long$selection == df.long$pred.RSF, 1, 0)
 
 # save trial level dataframe
-saveRDS(df.long, "data/SimulationData/useData/S1_dataTrialLevel.rds")
+saveRDS(df.long, "data/Study1Data/useData/S1_dataTrialLevel.rds")
 
 ## Section C1.2: Game Level Data
 
@@ -632,7 +644,7 @@ for (nn in unique(df.long$id)){
 df.game$risky.ag <- risky.ag
 df.game$risky.ug <- risky.ug
 
-saveRDS(df.game, "data/SimulationData/useData/S1_dataGameLevel.rds")
+saveRDS(df.game, "data/Study1Data/useData/S1_dataGameLevel.rds")
 
 ## Section C1.3: Participant Level Data
 
@@ -704,7 +716,7 @@ mean(df.participant$id == survey.df$id) == 1
 df.part <- merge(df.participant, survey.df, by = "id")
 
 
-saveRDS(df.part, "data/SimulationData/useData/S1_dataParticipantLevel.rds")
+saveRDS(df.part, "data/Study1Data/useData/S1_dataParticipantLevel.rds")
 
 
 
