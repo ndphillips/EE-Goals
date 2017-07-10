@@ -68,17 +68,15 @@ table(df.participant$goal.condition, df.participant$variance.condition)
 # PREDICTION: The probability of selecting the high-variance option given that one is below 100 points (the goal)
 #             is HIGHER in the goal than in the no goal condition.
 
-<<<<<<< HEAD
+
 m.rug <- glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
            data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
 
 summary(m.rug)
-=======
+
 m.rug.b <- blme::bglmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
                data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
 
-summary(m.rug.b)
->>>>>>> d4b6e7cf5fcec0851811f956f3ec81aec9fd92bd
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
 exp(m.rug.b@beta[2])
@@ -256,11 +254,8 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-<<<<<<< HEAD
-pirateplot(goalReachedRate ~ goal.condition + variance.condition, data = df.participant,
-=======
+
 yarrr::pirateplot(goalReachedRate ~ goal.condition + variance.condition, data = df.participant,
->>>>>>> d4b6e7cf5fcec0851811f956f3ec81aec9fd92bd
            ylab = "Reach goal", xlab = "Conditions", main = "Goal Reached Rate")
 # -----------------------
 
@@ -317,11 +312,8 @@ if (Sys.info()[1] == "Windows"){
   quartz(height = 22, width = 33)
 }
 par(mar=c(5,6.7,3,1.5))
-<<<<<<< HEAD
-pirateplot(points.cum ~ goal.condition + variance.condition, data = df.participant,
-=======
+
 yarrr::pirateplot(points.cum ~ goal.condition + variance.condition, data = df.participant,
->>>>>>> d4b6e7cf5fcec0851811f956f3ec81aec9fd92bd
            ylab = "Total Number of Points", xlab = "Conditions", main = "Total Points Reached")
 
 # -----------------------
