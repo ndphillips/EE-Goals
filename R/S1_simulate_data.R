@@ -1,6 +1,27 @@
 rm(list = ls())
 gc()
 
+# ------------
+# DATA SIMULATION
+#
+# Study (working title): Need based decision making in a reinforcement learning task.
+# 
+# Authors:
+#   - Markus D. Steiner (markus.d.steiner@gmail.com)
+#   - Nathaniel D. Phillips (Nathaniel.D.Phillips.is@gmail.com)
+# 
+# This script simulates data that is organized in the same way our real data will be. We used the simulated
+# data to then write the data preparation script (S1_dataPrep01_PrepareData.R) and the analysis script
+# (S1_01_mainAnalysis.R). For each simulated participant, at least four files are created: two or more id files
+# (sometimes participants restart the experiment by refreshing the browser window or exhibit a crash, then more than
+# two files are created) and two data files (one for the game data and one for the survey file).
+# 
+# ------------
+
+
+
+
+
 # ----------------
 # create simulation dataframes
 # ----------------

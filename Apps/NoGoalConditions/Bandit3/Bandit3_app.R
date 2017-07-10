@@ -106,7 +106,7 @@ link.i <- "https://econpsychbasel.shinyapps.io/Questionnaire3/"
 
 linkPage =paste0("location.href='",link.i , "';")
 
-
+ids.df <- read.csv("www/workerIdDatabase.csv")
 
 # --------------------------------
 # Section B: The user Interface and its JavaScript logic to run the game----
@@ -135,7 +135,8 @@ server <- function(input, output, session) {
                                   trials.max = nTrials,
                                   checkFails = 0,
                                   totalPoints = 0,
-                                  payout = 0)
+                                  payout = 0,
+                                  checkOK = 0)
   
   # GameValues stores vectors of histories
   GameData <- reactiveValues(trial = c(),          
@@ -180,6 +181,21 @@ server <- function(input, output, session) {
         )
       )}
     
+    
+    # Not Allowed Page
+    if (CurrentValues$page == "notAllowed") {
+      return(
+        div(class = "page2", checked = NA,
+            list(
+              tags$br(), tags$br(), tags$br(),
+              h2(paste0("You entered the WorkerID ", input$workerid,"."), class = "firstRow"),
+              p("Sorry but you are not eligible for this HIT because you completed a similar HIT in the past.", id = "notEligible"),
+              p("You may now close this window.")
+            )
+        )
+      )
+    }
+    
     # INSTRUCTIONS INTRO
     
     if (CurrentValues$page == "inst1") {
@@ -214,14 +230,14 @@ server <- function(input, output, session) {
               tags$p("At the top of the screen you will always see three important pieces of information: The number of clicks you have remaining in the game, the total number of points you have earned so far in the game and the goal."),
               h3("Here is a screenshot of how the game will look:"),
               tags$br(),
-              fixedRow(column(12, align ="center", tags$img(src = "instNoGoal.png"))),
+              fixedRow(column(12, align ="center", tags$img(src = "instNoGoal.PNG"))),
               # fixedRow(column = 12, plotOutput("InstructionDisplay")),
               # fixedRow(column = 12, plotOutput("resultsDisplayInstructions")),
               p(paste("To use one of your", nTrials, "clicks, you can click on one of the boxes. When you click on a box, the computer will randomly select one of the box's point values. This point value will be displayed in the box. The drawn point value will then be added to your point total (or subtracted from it if the value is negative). The number of clicks you have remaining will then decrease by 1. When you have 0 clicks remaining, the game will end.")),
               h3("More points equals higher bonus!"),
               p("You will earn a monetary bonus based on the number of points you earn in each game. For every 10 points you earn in a game, you will earn an additional 1 cent bonus."),
               h3("Points are returned to the boxes"),
-              p("The computer will always draw a random point value from the box and will always return that point value back to the box. In other words, the distribution of point values in each box",  strong("will not change over time as a result of your clicks.")),
+              p("The computer will always draw a random point value from the box and will always return that point value back to the box. In other words, the distribution of point values in each box",  strong("will not change over time as a result of your clicks. The distributions will also not change over games although the position of the boxes will randomly vary.")),
               tags$br(),
               actionButton(inputId = "gt_instCheck", label = "Continue", class = "continueButtons"),
               tags$br(),tags$br(),tags$br()
@@ -250,6 +266,22 @@ server <- function(input, output, session) {
             )
         )
       )}
+    
+    # SCREEN FAILED CHECK
+    if (CurrentValues$page == "failedCheck") {
+      
+      return(
+        div(class = "inst", checked = NA,
+            list(
+              tags$br(), tags$br(),
+              h3("Sorry, wrong answer. Please read the instructions again."),
+              p("Sorry, you did not answer the comprehension question correctly. Click continue to read the instructions again."),
+              tags$br(),
+              actionButton(inputId = "gt_inst2", label = "Continue", class = "continueButtons")
+            )
+        )
+      )}
+    
     # 4) PRACTICE GAME INSTRUCTIONS
     
     if (CurrentValues$page == "inst3") {
@@ -288,6 +320,7 @@ server <- function(input, output, session) {
               tags$script('newGame();'),
               column(12,
                      fixedRow(tags$br()),
+                     fixedRow(column(12, align = "left", h2(ifelse(CurrentValues$game == 1, "Practice Game", paste("Game ", CurrentValues$game - 1, "of 10"))))),
                      fixedRow(
                        column(6, align="right", p(id = "clicksRemaining",
                                                   paste(ifelse(CurrentValues$page == "game", nTrials, nTrialsPractice)))),
@@ -412,14 +445,22 @@ server <- function(input, output, session) {
   # --------------------------------
   
   # Section F1: Page Navigation Buttons
-  observeEvent(input$gt_inst1, {CurrentValues$page <- "inst1"})
+  observeEvent(input$gt_inst1, {
+    if (gsub("[[:space:]]", "", tolower(as.character(input$workerid))) %in% tolower(ids.df[, 1])){
+      CurrentValues$checkOk <- 1
+      CurrentValues$page <- "notAllowed"
+    } else {
+      CurrentValues$checkOk <- 2
+      CurrentValues$page <- "inst1"
+    }
+  })
   observeEvent(input$gt_inst2, {CurrentValues$page <- "inst2"})
   observeEvent(input$gt_instCheck, {CurrentValues$page <- "instCheck"})
   observeEvent(input$gt_inst3, {
     if (input$checkChange == 2) {
       CurrentValues$page <- "inst3"
     } else {
-      CurrentValues$page <- "inst2"
+      CurrentValues$page <- "failedCheck"
       CurrentValues$checkFails <- CurrentValues$checkFails + 1
     }
     })
@@ -488,7 +529,7 @@ server <- function(input, output, session) {
                                             "goal" = goal,
                                             "condition" = condition,
                                             "n.goals.reached" = NA,
-                                            "check.fails" = CurrentValues$checkFails,
+                                            "checkFails" = CurrentValues$checkFails,
                                             "payout" = CurrentValues$payout,
                                             "which.high.ev" = input$which.high.ev)
                    

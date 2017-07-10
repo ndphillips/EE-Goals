@@ -528,7 +528,7 @@ observe({
        !is.null(input$usedCalculator) &
        !is.null(input$gotHelp)){
       
-      if(input$gaveUp %in% c(1, 2) &
+      if(input$gaveUp %in% c(1:3) &
          input$tookNotes %in% c(1, 2) &
          input$usedCalculator %in% c(1, 2) &
          input$gotHelp %in% c(1, 2)){

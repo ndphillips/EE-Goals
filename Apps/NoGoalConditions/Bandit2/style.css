@@ -75,3 +75,7 @@ goal info on the game page to a higher value */
 	font-size: 160%;
 }
 
+#notEligible, #errorOcc {
+	font-size: 20px;
+	color: red;
+}

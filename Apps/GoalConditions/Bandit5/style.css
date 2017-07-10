@@ -86,6 +86,12 @@ goal info on the game page to a higher value */
 	color: #FF6A6A;
 }
 
-#pEarned {
-	padding-left: 0.5em;
+#pEarned, #clicksText {
+	padding-left: 1em;
+}
+
+
+#notEligible, #errorOcc {
+	font-size: 20px;
+	color: red;
 }
