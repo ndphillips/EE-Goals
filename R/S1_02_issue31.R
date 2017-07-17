@@ -73,12 +73,81 @@ evidence_strength <- function(df, strategy, nround, ...){
   df.evidence
 }
 
+
+evidence_strength2 <- function(df, strategy, nround, nbatches, ...){
+  if (strategy == "RSF") {
+    fav.opt <- round(df$p.getthere.1.subj - df$p.getthere.2.subj, nround)
+  } else if (strategy == "EV") {
+    fav.opt <- round((df$subj.mean.1 / df$sd.sub1) - (df$subj.mean.2 / df$sd.sub2), nround)
+  } else {
+    stop("No valid strategy. Strategy must be either EV or RSF")
+  }
+  fav.opt[fav.opt == Inf | fav.opt == -Inf] <- NA
+  
+  # create batches
+  batch.size <- (max(fav.opt, na.rm = TRUE) - min(fav.opt, na.rm = TRUE)) / nbatches
+  
+  batch.int <- cumsum(c(min(fav.opt, na.rm = TRUE), rep(batch.size, nbatches)))
+  
+  # compute the probability of choosing option 1, given a certain RSF.diff value
+  p.choose.1 <- unlist(lapply(seq_len(nbatches),
+                              function(x, df, fav.opt, batch.int){
+                                mean(df$selection[fav.opt >= batch.int[x] &
+                                                    fav.opt < batch.int[x+1]] == 1,
+                                     na.rm = TRUE)
+                              },
+                              df = df, fav.opt = fav.opt, batch.int = batch.int))
+  
+  numobs <- unlist(lapply(seq_len(nbatches),
+                          function(x, df, fav.opt, batch.int){
+                            vec <- df$selection[fav.opt >= batch.int[x] &
+                                                  fav.opt < batch.int[x+1]]
+                            vec <- vec[!is.na(vec)]
+                            
+                            lvec <- length(vec)
+                            
+                            lvec
+                            
+                          },
+                          df = df, fav.opt = fav.opt, batch.int = batch.int))
+  
+  # scale the size ob points
+  total.l <- length(df$selection[!is.na(df$selection)])
+  
+  numobs.s <- round(numobs / total.l, 2)
+  
+
+  # plot the results
+  plot(batch.int[1:(length(batch.int)-1)] + (batch.size / 2), p.choose.1, type = "b",
+       ylab = "p of Choosing Option 1", col = gray(0.3, .7), lwd = 2, cex = exp(numobs.s),
+       cex.lab = 1.5, cex.axis = 1.5, ylim = c(0, 1), pch = 16, ...)
+  
+  text(x = batch.int[1:(length(batch.int)-1)] + (batch.size / 2), 
+       y = p.choose.1, 
+       labels = numobs.s, pos = 3)
+  
+  df.evidence <- data.frame("p.choose.1" = p.choose.1,
+                            "batch.int" = batch.int[1:(length(batch.int)-1)] + (batch.size / 2),
+                            "n.obs" = numobs,
+                            "n.obs.s" = numobs.s)
+  
+  df.evidence
+}
+
 ### Evidence in RSF strategy --------------
 RSF.all <- evidence_strength(subset(df.trial, goal.condition == "Goal"), "RSF", 2,
                              xlab = "p getthere 1 - p getthere 2",
                              main = "Evidence Strength RSF, All Trials, Goal Condition")
 RSF.ug <- evidence_strength(subset(df.trial, goal.condition == "Goal" & overGoal == 0), "RSF", 2,
                             xlab = "p getthere 1 - p getthere 2",
+                            main = "Evidence Strength RSF, Under Goal, Goal Condition")
+
+# with the evidence2 function
+RSF.all2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal"), "RSF", 2, 10,
+                             xlab = "p getthere 1 - p getthere 2",
+                             main = "Evidence Strength RSF, All Trials, Goal Condition")
+RSF.ug2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" & overGoal == 0), "RSF", 2,
+                            10, xlab = "p getthere 1 - p getthere 2",
                             main = "Evidence Strength RSF, Under Goal, Goal Condition")
 
 ### Evidence in EV strategy ---------------
@@ -124,5 +193,17 @@ EV.no.goal <- evidence_strength(subset(df.trial, goal.condition == "NoGoal"), "E
                              xlab = "d prime 1 - d prime 2",
                              main = "Evidence Strength EV, All Trials, No Goal Condition")
 
+# with the evidence2 function
+EV.goal2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal"), "EV", 0, 10,
+                             xlab = "d prime 1 - d prime 2",
+                             main = "Evidence Strength EV, All Trials, Goal Condition")
+
+EV.goal.ug2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" & overGoal == 0), "EV", 0,
+                                10, xlab = "d prime 1 - d prime 2",
+                                main = "Evidence Strength EV, Under Goal, Goal Condition")
+
+EV.no.goal2 <- evidence_strength2(subset(df.trial, goal.condition == "NoGoal"), "EV", 0, 10,
+                                xlab = "d prime 1 - d prime 2",
+                                main = "Evidence Strength EV, All Trials, No Goal Condition")
 
 
