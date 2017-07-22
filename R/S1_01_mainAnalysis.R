@@ -66,7 +66,6 @@ table(df.participant$goal.condition, df.participant$variance.condition)
 # PREDICTION: The probability of selecting the high-variance option given that one is below 100 points (the goal)
 #             is HIGHER in the goal than in the no goal condition.
 
-<<<<<<< HEAD
 
 m.rug <- glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
            data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
@@ -76,12 +75,6 @@ summary(m.rug)
 m.rug.b <- blme::bglmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
                data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
 
-=======
-m.rug <- lme4::glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
-               data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
-
-summary(m.rug)
->>>>>>> 2299cb8b1b86e4731fae2d7e84caaf888c4db293
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
 exp(m.rug@beta[2])
