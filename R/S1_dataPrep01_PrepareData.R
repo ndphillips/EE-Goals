@@ -464,6 +464,9 @@ o2.vec.sub <- NULL
 sub.mean1 <- NULL
 sub.mean2 <- NULL
 
+sd.sub1 <- NULL
+sd.sub2 <- NULL
+
 # these are the means and sds of the distributions of the two environments
 mu.mat <- matrix(c(4, 4, 4, 2.5, 2.5, 4), ncol = 2, byrow = T)
 sd.mat <- matrix(rep(c(2.5, 11), 3), ncol = 2, byrow = T)
@@ -473,8 +476,14 @@ for (xx in 1:nrow(df.long)){
 
   # for both options compute the probability of reaching the 
   # goal if this option was chosen for the rest of the game
-  points.needed.i <- ifelse(df.long$game[xx] == 1, 25, 100) - df.long$points.cum[xx]
-  trials.left.i <- ifelse(df.long$game[xx] == 1, 20, 25) - df.long$trial[xx]
+  
+  # change from preregistration: only use last trials to determine points needed.
+  if (df.long$trial[xx] == 1){
+    points.needed.i <- ifelse(df.long$game[xx] == 1, 25, 100)
+  } else {
+    points.needed.i <- ifelse(df.long$game[xx] == 1, 25, 100) - df.long$points.cum[xx-1]
+  }
+  trials.left.i <- 26 - df.long$trial[xx] # change from preregistration: max trials + 1
   
   if (df.long$condition[xx] %in% c(1,4)){
     
@@ -532,6 +541,11 @@ for (xx in 1:nrow(df.long)){
   sub.mean1 <- c(sub.mean1, m1)
   sub.mean2 <- c(sub.mean2, m2)
   
+  ## change from preregistered code : append sds
+  # append to a vector to use later
+  sd.sub1 <- c(sd.sub1, sd1)
+  sd.sub2 <- c(sd.sub2, sd2)
+  
   # compute probabilities with these subjective distributions
   mu.i <- c(m1, m2)
   sigma.i <- c(sd1, sd2)
@@ -558,6 +572,10 @@ df.long$p.getthere.2.subj <- o2.vec.sub
 # append subjective mean vectors
 df.long$subj.mean.1 <- sub.mean1
 df.long$subj.mean.2 <- sub.mean2
+
+# append subective sd vectors
+df.long$sd.sub1 <- sd.sub1
+df.long$sd.sub2 <- sd.sub2
 
 # prepare objects
 choose.highvar <- NULL
@@ -679,13 +697,15 @@ df.participant <- df.long %>%
 risky.ag <- NULL
 risky.ug <- NULL
 
+df.long <- filter(df.long, game > 1)
+
 for (nn in unique(df.long$id)){
     
     risky.ag <- c(risky.ag,
-                  mean(df.long$selection[df.long$id == nn & df.long$points.cum >= ifelse(gg == 1, 25, 100)]
+                  mean(df.long$selection[df.long$id == nn & df.long$points.cum >=  100]
                        == 2, na.rm = TRUE))
     risky.ug <- c(risky.ug,
-                  mean(df.long$selection[df.long$id == nn & df.long$points.cum < ifelse(gg == 1, 25, 100)]
+                  mean(df.long$selection[df.long$id == nn & df.long$points.cum < 100]
                        == 2, na.rm = TRUE))
 }
 

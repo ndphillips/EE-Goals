@@ -10,7 +10,7 @@ if (!require(lme4)) install.packages("lme4"); library(lme4)
 if (!require(pwr)) install.packages("pwr"); library(pwr)
 
 # get data
-df <- readRDS("data/dataTrialLevelPGetthere.rds")
+df <- readRDS("data/PilotData/dataTrialLevelPGetthere.rds")
 
 # ----
 # Participant Level Analysis
@@ -84,8 +84,15 @@ df.n <- aggregate(high.var.chosen ~ choose.highvar + workerid + game, FUN = mean
 
 # compute a mixed effects model with game and workerid as random effects
 #summary(lmer(high.var.chosen ~ 1 + choose.highvar + (1|game) + (1|workerid), data = df.n))
-summary(glmer(high.var.chosen ~ choose.highvar + (1|game) + (1|workerid), data = subset(df, condition == 3), family = binomial))
+gm <- glmer(high.var.chosen ~ choose.highvar + (1|game) + (1|workerid), data = subset(df, condition == 3), family = binomial)
 
+if (!require(simr)) install.packages("simr"); library(simr)
+
+gm2 <- extend(gm, along = "choose.highvar", n = 20)
+
+gm.pc <- powerCurve(gm)
+
+plot(gm.pc)
 
 # plot it
 windows(height = 22, width = 33)
@@ -102,6 +109,10 @@ df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + workerid + game, FUN =
 #summary(lmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|workerid), data = df.n))
 m <- glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|workerid), data = subset(df, condition == 3), family = binomial)
 summary(m)
+
+m.pc <- powerCurve(m)
+
+plot(m.pc)
 
 
 # plot it

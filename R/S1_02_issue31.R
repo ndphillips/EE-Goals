@@ -150,6 +150,22 @@ RSF.ug2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" & overGo
                             10, xlab = "p getthere 1 - p getthere 2",
                             main = "Evidence Strength RSF, Under Goal, Goal Condition")
 
+# separated for variance conditions
+RSF.equal2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                          variance.condition == "Equal"), "RSF", 2,
+                              10, xlab = "p getthere 1 - p getthere 2",
+                              main = "Evidence Strength RSF, Equal EVs, Goal Condition")
+
+RSF.low2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                          variance.condition == "Low"), "RSF", 2,
+                                 10, xlab = "p getthere 1 - p getthere 2",
+                                 main = "Evidence Strength RSF, Low Variance, Goal Condition")
+
+RSF.high2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                        variance.condition == "High"), "RSF", 2,
+                               10, xlab = "p getthere 1 - p getthere 2",
+                               main = "Evidence Strength RSF, High Variance, Goal Condition")
+
 ### Evidence in EV strategy ---------------
 
 # THE FOLLOWING COMMENTED-OUT CODE ONLY HAD TO BE RUN ONCE, I THEN SAVED IT 
@@ -206,4 +222,37 @@ EV.no.goal2 <- evidence_strength2(subset(df.trial, goal.condition == "NoGoal"), 
                                 xlab = "d prime 1 - d prime 2",
                                 main = "Evidence Strength EV, All Trials, No Goal Condition")
 
+# let's check the different variance conditions separately
+
+EV.goal.equal2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                              variance.condition == "Equal"), "EV", 0, 10,
+                               xlab = "d prime 1 - d prime 2",
+                               main = "Evidence Strength EV, Equal EVs, Goal Condition")
+
+EV.goal.low2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                            variance.condition == "Low"), "EV", 0, 10,
+                                     xlab = "d prime 1 - d prime 2",
+                                     main = "Evidence Strength EV, Low variance, Goal Condition")
+
+EV.goal.high2 <- evidence_strength2(subset(df.trial, goal.condition == "Goal" &
+                                             variance.condition == "High"), "EV", 0, 10,
+                                     xlab = "d prime 1 - d prime 2",
+                                     main = "Evidence Strength EV, High Variance, Goal Condition")
+
+
+
+EV.no.goal.equal.2 <- evidence_strength2(subset(df.trial, goal.condition == "NoGoal" &
+                                                  variance.condition == "Equal"), "EV", 0, 10,
+                                  xlab = "d prime 1 - d prime 2",
+                                  main = "Evidence Strength EV, Equal EVs, No Goal Condition")
+
+EV.no.goal.low.2 <- evidence_strength2(subset(df.trial, goal.condition == "NoGoal" &
+                                                  variance.condition == "Low"), "EV", 0, 10,
+                                         xlab = "d prime 1 - d prime 2",
+                                         main = "Evidence Strength EV, Low Variance, No Goal Condition")
+
+EV.no.goal.high.2 <- evidence_strength2(subset(df.trial, goal.condition == "NoGoal" &
+                                                  variance.condition == "High"), "EV", 0, 10,
+                                         xlab = "d prime 1 - d prime 2",
+                                         main = "Evidence Strength EV, Equal EVs, No Goal Condition")
 

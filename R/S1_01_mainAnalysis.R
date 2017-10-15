@@ -34,6 +34,8 @@ if (!require(afex)) install.packages("afex"); library(afex)
 if (!require(coin)) install.packages("coin"); library(coin)
 if (!require(dplyr)) install.packages("dplyr"); library(dplyr)
 
+if (!require(sjPlot)) install.packages("sjPlot"); library(sjPlot)
+
 # Set working directory
 setwd(rprojroot::is_rstudio_project$find_file())
 
@@ -43,6 +45,10 @@ df.trial <- readRDS("data/Study1Data/useData/S1_dataTrialLevel.rds")
 df.game <- readRDS("data/Study1Data/useData/S1_dataGameLevel.rds")
 df.participant <- readRDS("data/Study1Data/useData/S1_dataParticipantLevel.rds")
 
+# Note: facorization was added after preregistration
+df.trial$id.f <- as.factor(df.trial$id)
+df.trial$variance.condition.f <- as.factor(df.trial$variance.condition)
+df.trial$goal.condition.f <- as.factor(df.trial$goal.condition)
 
 # ----------------------
 # Section A: Game Data
@@ -66,7 +72,7 @@ table(df.participant$goal.condition, df.participant$variance.condition)
 # PREDICTION: The probability of selecting the high-variance option given that one is below 100 points (the goal)
 #             is HIGHER in the goal than in the no goal condition.
 
-m.rug <- lme4::glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
+m.rug <- lme4::glmer(high.var.chosen ~ variance.condition.f + goal.condition.f + (1|game) + (1|id.f),
                data = subset(df.trial, overGoal == 0 & game > 1), family = binomial)
 
 summary(m.rug)
@@ -93,9 +99,11 @@ yarrr::pirateplot(risky.ug ~ goal.condition + variance.condition, data = df.part
 #             is LOWER in the goal than in the no goal condition.
 
 
-m.rag <- lme4::glmer(high.var.chosen ~ variance.condition + goal.condition + (1|game) + (1|id),
+m.rag <- lme4::glmer(high.var.chosen ~ variance.condition.f + goal.condition.f + (1|game) + (1|id.f),
                data = subset(df.trial, overGoal == 1 & game > 1), family = binomial)
+
 summary(m.rag)
+
 
 # get the odds ration of choosing the high variance option when the variance condition is High compared to Equal
 exp(m.rag@beta[2])
@@ -119,9 +127,10 @@ yarrr::pirateplot(risky.ag ~ goal.condition + variance.condition, data = df.part
 # PREDICTION: In the goal condition, the high variance option is chosen with a higher probability when it is rational
 #             to do so according to RSF.
 
-m.chv <- lme4::glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
+m.chv <- lme4::glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id.f),
                data = subset(df.trial, goal.condition == "Goal" & game > 1), family = binomial)
 summary(m.chv)
+
 
 # get the odds ration of choosing the high variance option when it is rational to do so
 exp(m.chv@beta[2])
@@ -133,7 +142,7 @@ exp(m.chv@beta[2])
 # PREDICTION: In the NoGoal condition, the high variance option is chosen with a higher probability when it is rational
 #             to do so according to RSF, but only to a small extent if at all.
 
-m.chv.ng <- lme4::glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id),
+m.chv.ng <- lme4::glmer(high.var.chosen ~ choose.highvar.subj + (1|game) + (1|id.f),
                   data = subset(df.trial, goal.condition == "NoGoal" & game > 1), family = binomial)
 
 summary(m.chv.ng)
@@ -143,8 +152,8 @@ exp(m.chv.ng@beta[2])
 # plot this result on participant level
 
 # first aggregate to participant level with choose.highvar as dichotomous variable
-df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + id + goal.condition + variance.condition, FUN = mean,
-                  data = subset(df.trial, game > 1))
+df.n <- aggregate(high.var.chosen ~ choose.highvar.subj + id + goal.condition + variance.condition,
+                  FUN = mean, data = subset(df.trial, game > 1))
 
 # plot the proportion of high variance chosen separated for the variance, the goal conditions and for whether it
 # was, according to rsf, rational to choose the high variance option
@@ -169,11 +178,12 @@ yarrr::pirateplot(high.var.chosen ~ choose.highvar.subj + variance.condition + g
 #             strategy will be more accurate than the EV strategy for the goal condition. However, in the no-goal
 #             condition, the EV strategy will make better predictions.
 
-# hwo often do the models make different predictions
+# Note: the next three lines were added after preregistration
+# how often do the models make different predictions
 with(subset(df.trial, game > 1), mean(pred.EV != pred.RSF, na.rm = TRUE))
 with(subset(df.trial, game > 1), tapply(pred.EV != pred.RSF, variance.condition, mean, na.rm = T))
-
-m.pa <- lme4::glmer(pred.RSF.acc ~ goal.condition + (1|game) + (1|id),
+with(subset(df.trial, game > 1 & goal.condition == "NoGoal"), mean(pred.RSF.acc[pred.EV != pred.RSF], na.rm = TRUE))
+m.pa <- lme4::glmer(pred.RSF.acc ~ goal.condition.f + (1|game) + (1|id.f),
               data = subset(df.trial, game > 1 & pred.EV != pred.RSF), family = binomial)
 
 summary(m.pa)

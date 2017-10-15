@@ -19,7 +19,7 @@ ui <- fixedPage(
 #  tags$style(type = "text/css", "#SelectC {margin-left: 40%;}"),
 #  tags$style(type = "text/css", "#firstRow {margin-top: 3em;"),
   useShinyjs()
-  
+
 
 )
 
@@ -28,7 +28,7 @@ server <- function(input, output, session) {
 
 # Stop the App from running when you close the browser window
 #session$onSessionEnded(stopApp)
-  
+
 # --------------------------
 # Dropbox Parameters
 # --------------------------
@@ -44,7 +44,7 @@ expContrDir <- "msteiner/GoalBanditJava/expControll"
 # --------------------------
 
 
-condition <- 1 
+condition <- 1
 
 
 # --------------------------
@@ -56,14 +56,14 @@ autoInvalidate <- reactiveTimer(1, session)
 # Set up reactive values
 # These are objects that will change over the course of the game
 # ---------
-  
+
 # CurrentValues stores scalers representing the latest game outcomes
 CurrentValues <- reactiveValues(page = 1)
 
 
 
 
-# CALCULATE COMPLETION CODE  
+# CALCULATE COMPLETION CODE
 completion.code <- paste0("EP-", sample(100:999, size = 1), "-", sample(100:999, size = 1), "-", sample(100:999, size = 1))
 
 # --------
@@ -71,10 +71,10 @@ completion.code <- paste0("EP-", sample(100:999, size = 1), "-", sample(100:999,
 # ---------
 {
 PageLayouts <- reactive({
-   
+
 # 1) WELCOME PAGE
 if (CurrentValues$page == 1) {
-  
+
   return(
     div(class = "page1", checked = NA,
     list(
@@ -82,12 +82,12 @@ if (CurrentValues$page == 1) {
       p("Before you start with the questionnaires, please enter your WorkerID below."),
       p("Again, your answers to all future questions will not affect your bonus. However, please make sure to complete the rest of the survey for your work and bonus to be accepted."),
       p("Please enter your mturk WorkerID below and click Continue."),
-      textInput(inputId = "workerid", 
-                label = "Please enter your WorkerID", 
-                value = "", 
+      textInput(inputId = "workerid",
+                label = "Please enter your WorkerID",
+                value = "",
                 placeholder = "e.g.; AXLDKGHSJM"),
       # This displays the action putton Next.
-     disabled(actionButton(inputId = "continue17", 
+     disabled(actionButton(inputId = "continue17",
                   label = "Continue", class = "continueButtons"))
     )
     )
@@ -137,8 +137,8 @@ if (CurrentValues$page == 17) {
       textAreaInput("comments",
                     label = NULL,
                     resize = "both"),
-      
-      disabled(actionButton(inputId = "continue18", 
+
+      disabled(actionButton(inputId = "continue18",
                    label = "Continue", class = "continueButtons"))
     )
   )
@@ -175,18 +175,18 @@ if (CurrentValues$page == 18) {
                 label = "",
                 resize = "both",
                 width = "500px"),
-  disabled(actionButton(inputId = "continue19", 
+  disabled(actionButton(inputId = "continue19",
                label = "Continue", class = "continueButtons"))
     )
   )
   )
 }
 
-    
+
 # 19) Post Game Survey B
 
-  
-  
+
+
 if (CurrentValues$page == 19) {
   return(
     div(class = "page19", checked = NA,
@@ -217,13 +217,13 @@ if (CurrentValues$page == 19) {
                                   "Yes, I received some form of help" = 1),
                    selected = character(0),
                    width = "500px"),
-      disabled(actionButton(inputId = "continue20", 
+      disabled(actionButton(inputId = "continue20",
                    label = "Continue", class = "continueButtons"))
     )
   )
   )
 }
-  
+
 # 20) Numeracy Test
 
 if (CurrentValues$page == 20) {
@@ -236,13 +236,13 @@ if (CurrentValues$page == 20) {
                 label = "",
                 placeholder = "XX % (Just enter the number without the % sign...)",
                 width = "500px"),
-      disabled(actionButton(inputId = "continue21", 
+      disabled(actionButton(inputId = "continue21",
                    label = "Continue", class = "continueButtons"))
     )
   )
   )
 }
-  
+
 # 21) CHECK IF NUMERACY ITEM WAS KNOWN
 
 if (CurrentValues$page == 21) {
@@ -255,16 +255,16 @@ if (CurrentValues$page == 21) {
                                   "No, this was the first time I answered this question." = 2),
                    selected = character(0),
                    width = "500px"),
-      disabled(actionButton(inputId = "continue22", 
+      disabled(actionButton(inputId = "continue22",
                    label = "Continue", class = "continueButtons"))
     )
   )
   )
 }
 
-# 22) FINAL DEMOGRAPHICS 
+# 22) FINAL DEMOGRAPHICS
 if (CurrentValues$page == 22) {
-  
+
  return(
    div(class = "page22", checked = NA,
        list(
@@ -272,10 +272,10 @@ if (CurrentValues$page == 22) {
                           label = "What is your sex?",
                           choices = list("Male" = 1, "Female" = 2, "Other" = 3),
                           selected = character(0)),
-             numericInput("age", 
+             numericInput("age",
                           label = "What is your age?",
                           value = 0),
-             radioButtons("interesting", 
+             radioButtons("interesting",
                           label = "How interesting did you find the Boxes Game?",
                          choices = c("1 - Not at all" =  1,
                                      "2" = 2,
@@ -320,10 +320,10 @@ if (CurrentValues$page == 22) {
                      label = "End Study", class = "continueButtons"))))
  )
 }
-   
+
 # 23) Goodbye
 if(CurrentValues$page == 23) {
- 
+
  return(
    div(class = "page23", checked = NA,
        list(
@@ -349,13 +349,13 @@ output$MainAction <- renderUI( {
 # Define button actions
 # Dynamic user interface of pages
 # ---------
-  
+
 
 # Page Continue button
  observeEvent(input$continue17, {
 #   disable("continue2")
    onlyID <- data.frame("workerID" = input$workerid)
-   # Write survey data 
+   # Write survey data
    IDDatafileName <- paste0(input$workerid, as.integer(Sys.time()), digest::digest(onlyID), "_s.csv")
    IDDatafilePath <- file.path(tempdir(), IDDatafileName)
    write.csv(onlyID, IDDatafilePath, row.names = FALSE, quote = TRUE)
@@ -367,38 +367,38 @@ output$MainAction <- renderUI( {
 #   disable("continue18")
    CurrentValues$page <- 18
  })
- 
+
  observeEvent(input$continue19, {
 #   disable("continue19")
    CurrentValues$page <- 19
  })
- 
+
  observeEvent(input$continue20, {
 #   disable("continue20")
    CurrentValues$page <- 20
  })
- 
+
  observeEvent(input$continue21, {
 #   disable("continue21")
    CurrentValues$page <- 21
  })
- 
+
  observeEvent(input$continue22, {
 #   disable("continue22")
    CurrentValues$page <- 22
  })
- 
+
 
 # Check for end of study
  observeEvent(input$end, {
 
-  # Create progress message   
-  withProgress(message = "Saving data...", 
+  # Create progress message
+  withProgress(message = "Saving data...",
               value = 0, {
-                  
+
   incProgress(.25)
   # Write Survey data
-  
+
   if(length(input$comments) == 0) {comments.i <- NA} else {comments.i <- input$comments}
   if(length(input$age) == 0) {age.i <- NA} else {age.i <- input$age}
   if(length(input$sex) == 0) {sex.i <- NA} else {sex.i <- input$sex}
@@ -455,127 +455,127 @@ output$MainAction <- renderUI( {
                              "condition" = condition,
                              "caredReachGoal" = caredReachGoal.i)
   incProgress(.5)
-  
-  # Write survey data 
+
+  # Write survey data
   SurveyDatafileName <- paste0(input$workerid, as.integer(Sys.time()), digest::digest(SurveyData.i), "_s.csv")
   SurveyDatafilePath <- file.path(tempdir(), SurveyDatafileName)
   write.csv(SurveyData.i, SurveyDatafilePath, row.names = FALSE, quote = TRUE)
   rdrop2::drop_upload(SurveyDatafilePath, dest = outputDir, dtoken = EPtoken)
-  
+
   incProgress(.75)
-  
+
   CurrentValues$page <- 23
   Sys.sleep(.5)
   incProgress(1)
-                  
+
                 })
-   
+
  })
 
  # Check for end of game
- 
+
 observe({
 
     # Check if input was given and enable and disable the continue button
   if(CurrentValues$page == 1){
-    
+
     if(!is.null(input$workerid)){
-      
+
       if(nchar(as.character(input$workerid)) > 4){
-        
+
         enable("continue17")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 17){
 
     if(!is.null(input$gameDifficulty) &
        !is.null(input$strategy) &
        !is.null(input$strategyChange) &
        !is.null(input$whichStrategy)){
-      
+
       if(input$gameDifficulty %in% c(1:5) &
          nchar(as.character(input$strategy)) > 1 &
          nchar(as.character(input$strategyChange)) > 1 &
          input$whichStrategy %in% c(1, 2)){
-        
+
         enable("continue18")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 18){
-    
+
     if(!is.null(input$instructionsClear) &
        !is.null(input$errorOrBugs)){
-      
+
       if(input$instructionsClear %in% c(1, 2) &
          input$errorOrBugs %in% c(1, 2)){
-        
+
         enable("continue19")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 19){
-    
+
     if(!is.null(input$gaveUp) &
        !is.null(input$tookNotes) &
        !is.null(input$usedCalculator) &
        !is.null(input$gotHelp)){
-      
+
       if(input$gaveUp %in% c(1:3) &
          input$tookNotes %in% c(1, 2) &
          input$usedCalculator %in% c(1, 2) &
          input$gotHelp %in% c(1, 2)){
-        
+
         enable("continue20")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 20){
-    
+
     if(!is.null(input$BNT)){
-      
+
       if(nchar(as.character(input$BNT)) >= 1){
-        
+
         enable("continue21")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 21){
     if(!is.null(input$knewBNT)){
       if(input$knewBNT %in% c(1, 2)){
-        
+
         enable("continue22")
-        
+
       }
     }
   }
-  
+
   if(CurrentValues$page == 22){
     if(!is.null(input$sex) &
        !is.null(input$interesting) &
        !is.null(input$education) &
        !is.null(input$attentionCheck) &
        !is.null(input$trustData)){
-      
+
       if(input$sex %in% 1:3 &
          input$interesting %in% 1:5 &
          input$education %in% 1:6 &
          input$attentionCheck %in% 1:3 &
          input$trustData %in% 1:2){
-         
+
         enable("end")
-        
+
       }
     }
   }
